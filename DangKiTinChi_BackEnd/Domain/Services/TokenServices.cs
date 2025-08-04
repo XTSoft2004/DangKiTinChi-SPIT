@@ -106,9 +106,9 @@ namespace Domain.Services
             if (String.IsNullOrEmpty(token))
                 return null;
 
-            var tokenUser = await _token!.FindAsync(f => f.Token == token);
-            if (tokenUser == null)
-                return null;
+            //var tokenUser = await _token!.FindAsync(f => f.Token == token);
+            //if (tokenUser == null)
+            //    return null;
 
             token = token.Replace("Bearer", "").Trim();
             var handler = new JwtSecurityTokenHandler();
