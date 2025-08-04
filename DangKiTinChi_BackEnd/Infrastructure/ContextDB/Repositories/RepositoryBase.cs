@@ -1,11 +1,14 @@
-﻿using Domain.Interfaces.Helper;
-using Domain.Interfaces.Repositories;
-using Microsoft.EntityFrameworkCore;
-using Domain.Common.Extensions;
+﻿using Domain.Common.Extensions;
 using Domain.Interfaces.Entities;
-using System.Data;
-using System.Linq.Expressions;
+using Domain.Interfaces.Helper;
+using Domain.Interfaces.Repositories;
 using Infrastructure.ContextDB;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
+using System.Data;
+using System.Linq;
+using System.Linq.Expressions;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Infrastructure.ContextDB.Repositories
 {
@@ -25,6 +28,20 @@ namespace Infrastructure.ContextDB.Repositories
         public IQueryable<T> All()
         {
             return _dbSet.AsQueryable();
+        }
+        public IQueryable<T> All(List<string>? includeTables = null)
+        {
+            IQueryable<T> query = _dbSet;
+
+            if (includeTables != null && includeTables.Any())
+            {
+                foreach (var table in includeTables)
+                {
+                    query = query.Include(table);
+                }
+            }
+
+            return query.AsQueryable();
         }
 
         public void TotallyDelete(T entity)
@@ -120,13 +137,22 @@ namespace Infrastructure.ContextDB.Repositories
             return _dbSet.Where(expression).FirstOrDefault();
         }
 
-        public Task<T> FindAsync(Expression<Func<T, bool>> expression, string includeTable = "")
+        public Task<T?> FindAsync(Expression<Func<T, bool>> expression, params string[] includeTables)
         {
-            if(String.IsNullOrEmpty(includeTable))
+            IQueryable<T> query = _dbSet.Where(expression);
+
+            if (includeTables != null && includeTables.Length > 0)
             {
-                return _dbSet.Where(expression).FirstOrDefaultAsync();
+                foreach (var includeTable in includeTables)
+                {
+                    if (!string.IsNullOrWhiteSpace(includeTable))
+                    {
+                        query = query.Include(includeTable);
+                    }
+                }
             }
-            return _dbSet.Where(expression).Include(includeTable).FirstOrDefaultAsync();
+
+            return query.FirstOrDefaultAsync();
         }
         public Task<T> FindAsync(Expression<Func<T, bool>> expression, List<string>? includeTables = null)
         {

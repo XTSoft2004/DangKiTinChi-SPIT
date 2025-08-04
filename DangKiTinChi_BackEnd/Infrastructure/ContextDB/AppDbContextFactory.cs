@@ -14,13 +14,15 @@ namespace Infrastructure.ContextDB
             if (!string.IsNullOrEmpty(manualPath) && File.Exists(manualPath))
             {
                 DotNetEnv.Env.Load(manualPath);
+                Console.WriteLine("Loaded environment variables from: " + manualPath);
             }
             else
             {
                 var envPath = Path.Combine(Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent.Parent.Parent.Parent.FullName, ".env");
                 DotNetEnv.Env.Load(envPath);
+                Console.WriteLine("Loaded environment variables from: " + envPath);
             }
-            Console.WriteLine("API_SERVER = " + Environment.GetEnvironmentVariable("API_SERVER"));
+            Console.WriteLine("API_SERVER = " + Environment.GetEnvironmentVariable("DB_SERVER"));
 
             // Lấy các thông tin kết nối từ biến môi trường
             string dbServer = Environment.GetEnvironmentVariable("DB_SERVER");

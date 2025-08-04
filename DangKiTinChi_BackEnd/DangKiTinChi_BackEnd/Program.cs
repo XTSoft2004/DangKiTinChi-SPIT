@@ -1,11 +1,14 @@
-﻿using System.Security.Claims;
-using System.Text;
+﻿using Domain.Common.BackgroudServices;
 using Domain.Common.Http;
 using Domain.Interfaces.Repositories;
+using Domain.Interfaces.Services;
 using Infrastructure.ContextDB.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Server_Manager.Middleware;
+using System.Security.Claims;
+using System.Text;
 using WebApp.Configures.DIConfig;
 
 var builder = WebApplication.CreateBuilder(new WebApplicationOptions
@@ -107,6 +110,7 @@ builder.Services.AddEndpointsApiExplorer();
 //builder.Services.AddScoped<IGeminiServices, GeminiServices>();
 builder.Services.AddScoped(typeof(IRepositoryBase<>), typeof(RepositoryBase<>));
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddHostedService<LoadRolesBackground>();
 
 var app = builder.Build();
 
@@ -120,14 +124,14 @@ app.UseStaticFiles();
 var httpContextAccessor = app.Services.GetRequiredService<IHttpContextAccessor>();
 HttpAppContext.Configure(httpContextAccessor);
 
-//app.Use(async (context, next) =>
-//{
-//    using (var scope = context.RequestServices.CreateScope())
-//    {
-//        var middleware = new JwtMiddleware(next, context.RequestServices.GetRequiredService<IConfiguration>(), scope.ServiceProvider.GetRequiredService<ITokenServices>(), scope.ServiceProvider.GetRequiredService<IUserServices>());
-//        await middleware.Invoke(context);
-//    }
-//});
+app.Use(async (context, next) =>
+{
+    using (var scope = context.RequestServices.CreateScope())
+    {
+        var middleware = new JwtMiddleware(next, context.RequestServices.GetRequiredService<IConfiguration>(), scope.ServiceProvider.GetRequiredService<ITokenServices>(), scope.ServiceProvider.GetRequiredService<IUserServices>());
+        await middleware.Invoke(context);
+    }
+});
 
 #region Kiểm tra chữ ký JWT
 app.Use(async (context, next) =>

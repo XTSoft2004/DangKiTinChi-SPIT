@@ -10,6 +10,22 @@ namespace Domain.Common
         [Display(Name = "User")]
         User,
     }
+    public enum Register_Enum
+    {
+        [Display(Name = "Đã đăng ký")]
+        Registered,
+        [Display(Name = "Chưa đăng ký")]
+        NotRegistered,
+        [Display(Name = "Đang đăng kí")]
+        Pending,
+    }
+    public enum Status_Proxy_Enum
+    {
+        [Display(Name = "Đang hoạt động")]
+        Active,
+        [Display(Name = "Ngừng hoạt động")]
+        Inactive,
+    }
     public static class EnumExtensions
     {
         // Lấy tên hiển thị của enum từ giá trị

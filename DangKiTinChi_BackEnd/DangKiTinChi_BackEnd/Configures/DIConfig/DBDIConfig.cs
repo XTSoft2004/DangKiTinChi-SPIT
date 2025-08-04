@@ -1,13 +1,15 @@
 ﻿//using Domain.Infrastructures;
 //using Infrastructure.DbContext;
-using Microsoft.EntityFrameworkCore;
-using Domain.Interfaces.Database;
-using static Domain.Common.AppConstants;
-using Infrastructure.ContextDB;
 //using Domain.Interfaces.Services;
 //using Domain.Services;
 using Domain.Common.Extensions;
+using Domain.Interfaces.Database;
+using Domain.Interfaces.Services;
+using Domain.Services;
+using Infrastructure.ContextDB;
+using Microsoft.EntityFrameworkCore;
 using System.Reflection;
+using static Domain.Common.AppConstants;
 
 namespace WebApp.Configures.DIConfig
 {
@@ -25,6 +27,8 @@ namespace WebApp.Configures.DIConfig
             services.AddDbContext<AppDbContext>(options => options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
             // Inject UnitOfWork
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddServicesFromAssembly(typeof(IUserServices).Assembly, "Domain.Interfaces");
+
             //services.AddScoped<RequestHttpClient>();
             //// Add Interfaces Automatic
             //services.AddServicesFromAssembly(typeof(IGoogleDriverServices).Assembly, "Domain.Interfaces");

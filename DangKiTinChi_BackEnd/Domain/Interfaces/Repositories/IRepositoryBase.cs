@@ -17,20 +17,19 @@ namespace Domain.Interfaces.Repositories
         /// </summary>
         /// <param name="expression"></param>
         /// <returns>Entity</returns>
-        Task<T> FindAsync(Expression<Func<T, bool>> expression, string includeTable = "");
-        /// <summary>
-        /// Find an entity with expression and include related tables
-        /// </summary>
-        /// <param name="expression"></param>
-        /// <param name="includeTables"></param>
-        /// <returns></returns>
-        Task<T> FindAsync(Expression<Func<T, bool>> expression, List<string>? includeTables = null);
+        Task<T> FindAsync(Expression<Func<T, bool>> expression, params string[] includeTables);
         /// <summary>
         /// Find all entities in a table
         /// </summary>
         /// <param name="expression"></param>
         /// <returns>List of entities</returns>
         IQueryable<T> All();
+        /// <summary>
+        /// Find all entities in a table with include related tables
+        /// </summary>
+        /// <param name="includeTables"></param>
+        /// <returns></returns>
+        IQueryable<T> All(List<string>? includeTables = null);
 
         /// <summary>
         /// Find entities with expression
