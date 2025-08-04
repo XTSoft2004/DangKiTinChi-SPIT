@@ -18,10 +18,10 @@ namespace Domain.Services
     public class DepartmentServices : BaseService, IDepartmentServices
     {
         private readonly IRepositoryBase<Department> _department;
-        private readonly TokenServices _tokenServices;
+        private readonly ITokenServices _tokenServices;
         private UserTokenResponse? userMeToken;
 
-        public DepartmentServices(IRepositoryBase<Department> department, TokenServices tokenServices)
+        public DepartmentServices(IRepositoryBase<Department> department, ITokenServices tokenServices)
         {
             _department = department;
             _tokenServices = tokenServices;

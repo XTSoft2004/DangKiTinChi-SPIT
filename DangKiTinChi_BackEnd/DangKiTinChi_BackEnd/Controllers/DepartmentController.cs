@@ -1,4 +1,6 @@
-﻿using Domain.Interfaces.Services;
+﻿using Domain.Common.Http;
+using Domain.Entities;
+using Domain.Interfaces.Services;
 using Domain.Model.Request.Department;
 using Microsoft.AspNetCore.Mvc;
 using static Domain.Common.AppConstants;
@@ -55,11 +57,7 @@ namespace DangKiTinChi_BackEnd.Controllers
             var (departments, totalRecords) = await _departmentServices.GetAllAsync(search, pageNumber, pageSize);
             var totalPages = (int)Math.Ceiling((double)totalRecords / pageSize);
 
-            return Ok(new
-            {
-                Data = departments,
-                TotalRecords = totalRecords,
-            });
+            return Ok(ResponseArray.ResponseList(departments, totalRecords, totalPages, pageNumber, pageSize));
         }
     }
 }

@@ -19,9 +19,9 @@ namespace Domain.Services
     public class LecturerServices : BaseService, ILecturerServices
     {
         public readonly IRepositoryBase<Lecturer> _lecturer;
-        private readonly TokenServices _tokenServices;
+        private readonly ITokenServices _tokenServices;
         private UserTokenResponse? userMeToken;
-        public LecturerServices(IRepositoryBase<Lecturer> lecturer, TokenServices tokenServices)
+        public LecturerServices(IRepositoryBase<Lecturer> lecturer, ITokenServices tokenServices)
         {
             _lecturer = lecturer;
             _tokenServices = tokenServices;
@@ -45,9 +45,7 @@ namespace Domain.Services
         {
             var lecturer = await _lecturer.FindAsync(x => x.Id == id);
             if (lecturer == null)
-            {
                 return HttpResponse.Error("Giảng viên không tồn tại", System.Net.HttpStatusCode.NotFound);
-            }
 
             lecturer.Name = FormData.Name;
             lecturer.ModifiedDate = DateTime.Now;   
@@ -62,9 +60,7 @@ namespace Domain.Services
         {
             var lecturer = await _lecturer.FindAsync(x => x.Id == id);
             if (lecturer == null)
-            {
                 return HttpResponse.Error("Giảng viên không tồn tại", System.Net.HttpStatusCode.NotFound);
-            }
 
             _lecturer.TotallyDelete(lecturer);
             await UnitOfWork.CommitAsync();
@@ -77,7 +73,7 @@ namespace Domain.Services
 
             if (!string.IsNullOrEmpty(search))
             {
-                query = query.Where(x => x.Name.Contains(search, StringComparison.OrdinalIgnoreCase));
+                query = query.Where(x => x.Name.ToLower().Contains(search));
             }
 
             var TotalRecords = await query.CountAsync();

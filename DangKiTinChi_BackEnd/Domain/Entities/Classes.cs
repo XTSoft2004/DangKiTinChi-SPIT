@@ -11,6 +11,8 @@ namespace Domain.Entities
     public class Classes : EntityBase
     {
         // Mã lớp học
+        public string? Code { get; set; }
+        // Tên lớp học
         public string? Name { get; set; }
         // Thứ học
         public int? Day { get; set; }
