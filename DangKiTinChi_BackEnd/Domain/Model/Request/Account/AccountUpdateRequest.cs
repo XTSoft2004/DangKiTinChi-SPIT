@@ -14,6 +14,7 @@ namespace Domain.Model.Request.Account
         public string? FullName { get; set; }
         public string? Cookie { get; set; }
         public string? SemeterName { get; set; }
+        public string? DomainSchool { get; set; }
         public string? __RequestVerificationToken { get; set; }
     }
 }

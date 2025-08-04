@@ -13,12 +13,12 @@ namespace Domain.Entities
     {
         // Tên đăng nhập của tài khoản
         [Required, StringLength(50)]
-        public string? Username { get; set; }
+        public string? UserName { get; set; }
         // Mật khẩu của tài khoản
         [Required, StringLength(50)]
         public string? Password { get; set; }
         // Họ và tên của người dùng
-        [Required, StringLength(150)]
+        [StringLength(150)]
         public string? FullName { get; set; }
         // Cookie của người dùng đó
         public string? Cookie { get; set; }

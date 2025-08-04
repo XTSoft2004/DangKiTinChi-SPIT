@@ -38,5 +38,11 @@ namespace Domain.Interfaces.Services
         /// <param name="pageSize"></param>
         /// <returns></returns>
         Task<(List<AccountResponse>?, int TotalRecords)> GetAccounts(string search, int pageNumber, int pageSize);
+        /// <summary>
+        /// Login tài khoản vào hệ thống trường học
+        /// </summary>
+        /// <param name="AccountId"></param>
+        /// <returns></returns>
+        Task<HttpResponse> LoginAccount(long? AccountId);
     }
 }

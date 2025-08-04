@@ -3,6 +3,7 @@ using Domain.Interfaces.Services;
 //using Domain.Model.Response.Auth;
 using Domain.Model.Response.User;
 using Domain.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
@@ -27,6 +28,15 @@ namespace Server_Manager.Middleware
 
         public async Task Invoke(HttpContext context)
         {
+            var endpoint = context.GetEndpoint();
+            var hasAuthorize = endpoint?.Metadata?.GetMetadata<AuthorizeAttribute>() != null;
+            if (!hasAuthorize)
+            {
+                // Không yêu cầu xác thực => bỏ qua middleware
+                await _next(context);
+                return;
+            }
+
             var bypassRoutes = new[]
             {
                 "/auth/login",

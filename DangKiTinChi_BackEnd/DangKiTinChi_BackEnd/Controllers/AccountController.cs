@@ -2,6 +2,7 @@
 using Domain.Entities;
 using Domain.Interfaces.Services;
 using Domain.Model.Request.Account;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using static Domain.Common.AppConstants;
 
@@ -39,7 +40,6 @@ namespace DangKiTinChi_BackEnd.Controllers
             var response = await _account.CreateAsync(accountRequest);
             return response.ToActionResult();
         }
-
         [HttpPatch("{AccountID}")]
         public async Task<IActionResult> UpdateAsync(long? AccountID, AccountUpdateRequest accountUpdateRequest)
         {
@@ -57,6 +57,14 @@ namespace DangKiTinChi_BackEnd.Controllers
                 return BadRequest(DefaultString.INVALID_MODEL);
 
             var response = await _account.DeleteAsync(AccountID);
+            return response.ToActionResult();
+        }
+        [HttpGet("login-account/{AccountID}")]
+        public async Task<IActionResult> LoginAccount(long? AccountID)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(DefaultString.INVALID_MODEL);
+            var response = await _account.LoginAccount(AccountID);
             return response.ToActionResult();
         }
     }
