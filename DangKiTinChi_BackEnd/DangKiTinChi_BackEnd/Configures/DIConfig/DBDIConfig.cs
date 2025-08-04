@@ -2,7 +2,9 @@
 //using Infrastructure.DbContext;
 //using Domain.Interfaces.Services;
 //using Domain.Services;
+using Domain.Common.API;
 using Domain.Common.Extensions;
+using Domain.Common.HttpRequest;
 using Domain.Interfaces.Database;
 using Domain.Interfaces.Services;
 using Domain.Services;
@@ -28,6 +30,8 @@ namespace WebApp.Configures.DIConfig
             // Inject UnitOfWork
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddServicesFromAssembly(typeof(IUserServices).Assembly, "Domain.Interfaces");
+            services.AddScoped<ISchoolAPI, SchoolAPI>();
+            services.AddScoped<IHttpRequestHelper, HttpRequestHelper>();
 
             //services.AddScoped<RequestHttpClient>();
             //// Add Interfaces Automatic

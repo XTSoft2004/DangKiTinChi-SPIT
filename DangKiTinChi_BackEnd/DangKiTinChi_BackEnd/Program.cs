@@ -178,6 +178,8 @@ app.Use(async (context, next) =>
 app.UseHttpsRedirection();
 
 app.UseRouting();
+//app.UseMiddleware<JwtMiddleware>();
+
 app.UseAuthentication();
 app.UseAuthorization();
 
