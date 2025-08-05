@@ -78,7 +78,7 @@ namespace Domain.Common
                        .ToList();
         }
         // Lấy tất cả tên hiển thị của enum T
-        public static T? GetEnumValueFromDisplayName<T>(string input) where T : struct, Enum
+        public static T? GetEnumValueFromDisplayName<T>(string? input) where T : struct, Enum
         {
             var type = typeof(T);
             var fields = type.GetFields(BindingFlags.Public | BindingFlags.Static);
@@ -101,6 +101,31 @@ namespace Domain.Common
             }
 
             return null;
+        }
+        public static T GetEnumValueFromDisplayName<T>(string? input, T defaultValue) where T : struct, Enum
+        {
+            if (string.IsNullOrWhiteSpace(input))
+                return defaultValue;
+
+            var type = typeof(T);
+            var fields = type.GetFields(BindingFlags.Public | BindingFlags.Static);
+
+            foreach (var field in fields)
+            {
+                var displayAttr = field.GetCustomAttribute<DisplayAttribute>();
+                if (displayAttr?.Name != null &&
+                    displayAttr.Name.Equals(input, StringComparison.OrdinalIgnoreCase))
+                {
+                    return (T)field.GetValue(null)!;
+                }
+
+                if (field.Name.Equals(input, StringComparison.OrdinalIgnoreCase))
+                {
+                    return (T)field.GetValue(null)!;
+                }
+            }
+
+            return defaultValue;
         }
     }
 }

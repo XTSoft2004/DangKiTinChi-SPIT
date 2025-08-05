@@ -162,7 +162,6 @@ namespace Domain.Services
                                                         .ToOffset(TimeSpan.FromHours(7)) // Chuyển sang GMT+7
                                                         .DateTime : DateTime.MinValue;
         }
-
         public async Task<string> GetRefreshToken(long? userId)
         {
             var TokenUser = await _token.FindAsync(f => f.UserId == userId);

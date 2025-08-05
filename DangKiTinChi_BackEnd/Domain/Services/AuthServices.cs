@@ -84,6 +84,7 @@ namespace Domain.Services
                 RoleName = AppFunction.GetRoleName(user.RoleId)?.DisplayName,
                 AvatarUrl = user.AvatarUrl,
                 isLocked = user.IsLocker,
+
                 AccessToken = tokenResponse.AccessToken,
                 ExpiresAt = tokenResponse.ExpiresAt,
                 RefreshToken = tokenResponse.RefreshToken,

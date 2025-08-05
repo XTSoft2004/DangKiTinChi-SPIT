@@ -49,23 +49,19 @@ namespace Domain.Services
         {
             var infoProxy = await _infoProxy.FindAsync(x => x.Id == id);
             if (infoProxy == null)
-            {
                 return HttpResponse.Error(message: "Proxy không tồn tại", statusCode: System.Net.HttpStatusCode.NotFound);
-            }
 
-            Status_Proxy_Enum? status_Proxy_Enum = null;
             if (FormData.Status != null)
             {
-                status_Proxy_Enum = EnumExtensions.GetEnumFromDisplayName<Status_Proxy_Enum>(FormData.Status);
-                if (status_Proxy_Enum == null)
-                {
+                var status_Proxy_EnumNullable = EnumExtensions.GetEnumFromDisplayName<Status_Proxy_Enum>(FormData.Status);
+                if (!status_Proxy_EnumNullable.HasValue)
                     return HttpResponse.Error(message: "Trạng thái proxy không hợp lệ", statusCode: System.Net.HttpStatusCode.BadRequest);
-                }
+              
+                infoProxy.Status = status_Proxy_EnumNullable.Value;
             }
 
             infoProxy.Proxy = FormData.Proxy;
             infoProxy.TypeProxy = FormData.TypeProxy;
-            infoProxy.Status = (Status_Proxy_Enum)status_Proxy_Enum;
             infoProxy.ModifiedDate = DateTime.Now;
             infoProxy.ModifiedBy = userMeToken?.Username;
 

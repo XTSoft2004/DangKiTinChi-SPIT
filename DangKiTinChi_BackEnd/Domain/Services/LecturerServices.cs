@@ -62,7 +62,7 @@ namespace Domain.Services
             if (lecturer == null)
                 return HttpResponse.Error("Giảng viên không tồn tại", System.Net.HttpStatusCode.NotFound);
 
-            _lecturer.TotallyDelete(lecturer);
+            _lecturer.Delete(lecturer);
             await UnitOfWork.CommitAsync();
 
             return HttpResponse.OK(message: "Xoá giảng viên thành công");

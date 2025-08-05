@@ -35,7 +35,7 @@ namespace Domain.Services
 
         public async Task<HttpResponse> CreateAsync(AccountRequest accountRequest)
         {
-            var existingAccount = await _account!.FindAsync(f => f.UserName == accountRequest.Username);
+            var existingAccount = await _account!.FindAsync(f => f.UserName == accountRequest.Username && f.UserId == userMeToken.Id);
             if (existingAccount != null)
                 return HttpResponse.Error("Tài khoản đã tồn tại!", System.Net.HttpStatusCode.Conflict);
 
@@ -59,7 +59,7 @@ namespace Domain.Services
         }
         public async Task<HttpResponse> UpdateAsync(long? AccountId, AccountUpdateRequest accountUpdateRequest)
         {
-            var existingAccount = await _account!.FindAsync(f => f.Id == AccountId);
+            var existingAccount = await _account!.FindAsync(f => f.Id == AccountId && f.UserId == userMeToken.Id);
             if(existingAccount == null)
                 return HttpResponse.Error("Tài khoản không tồn tại!", HttpStatusCode.NotFound);
 
@@ -78,10 +78,11 @@ namespace Domain.Services
         }
         public async Task<HttpResponse> DeleteAsync(long? AccountId)
         {
-            var existingAccount = await _account!.FindAsync(f => f.Id == AccountId);
+            var existingAccount = await _account!.FindAsync(f => f.Id == AccountId && f.UserId == userMeToken.Id);
             if(existingAccount == null)
                 return HttpResponse.Error("Tài khoản không tồn tại!", HttpStatusCode.NotFound);
             _account.Delete(existingAccount);
+
             await UnitOfWork.CommitAsync();
             return HttpResponse.OK(message: "Xoá tài khoản thành công!", statusCode: HttpStatusCode.OK);
         }

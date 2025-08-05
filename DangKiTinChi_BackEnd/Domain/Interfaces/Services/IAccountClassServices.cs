@@ -23,7 +23,7 @@ namespace Domain.Interfaces.Services
         /// <param name="id"></param>
         /// <param name="FormData"></param>
         /// <returns></returns>
-        Task<HttpResponse> UpdateAsync(long? id, AccountClassRequest FormData);
+        Task<HttpResponse> UpdateAsync(long? id, AccountClassUpdateRequest FormData);
         /// <summary>
         /// Xoá 1 tài khoản lớp học
         /// </summary>

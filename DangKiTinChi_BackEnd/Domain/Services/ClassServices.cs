@@ -82,15 +82,22 @@ namespace Domain.Services
             existingClass.Room = classUpdateRequest.Room ?? existingClass.Room;
             existingClass.MaxStudent = classUpdateRequest.MaxStudent ?? existingClass.MaxStudent;
 
-            var lecturer = await _lecturer.FindAsync(f => f.Id == classUpdateRequest.LecturerId);
-            if (lecturer != null)
+            if(existingClass.LecturerId != classUpdateRequest.LecturerId)
             {
+                var lecturer = await _lecturer.FindAsync(f => f.Id == classUpdateRequest.LecturerId);
+                if (lecturer == null)
+                    return HttpResponse.Error("Giảng viên không tồn tại!", System.Net.HttpStatusCode.NotFound);
+                
                 existingClass.LecturerId = lecturer.Id;
                 existingClass.Lecturer = lecturer;
             }
-            var course = await _course.FindAsync(f => f.Id == classUpdateRequest.CourseId);
-            if (course != null)
+
+            if(existingClass.CourseId != classUpdateRequest.CourseId)
             {
+                var course = await _course.FindAsync(f => f.Id == classUpdateRequest.CourseId);
+                if (course == null)
+                    return HttpResponse.Error("Khóa học không tồn tại!", System.Net.HttpStatusCode.NotFound);
+                
                 existingClass.CourseId = course.Id;
                 existingClass.Course = course;
             }

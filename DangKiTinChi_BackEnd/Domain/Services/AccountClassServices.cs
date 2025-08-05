@@ -37,15 +37,14 @@ namespace Domain.Services
         public async Task<HttpResponse> CreateAsync(AccountClassRequest FormData)
         {
             var account = _account.Find(x => x.Id == FormData.AccountId);
-            var classes = _classes.Find(x => x.Id == FormData.ClassesId);
-            var infoProxy = _infoProxy.Find(x => x.Id == FormData.InfoProxyId);
-
             if (account == null)
                 return HttpResponse.Error(message: "Tài khoản không tồn tại", statusCode: System.Net.HttpStatusCode.NotFound);
 
+            var classes = _classes.Find(x => x.Id == FormData.ClassesId);
             if (classes == null)
                 return HttpResponse.Error(message: "Lớp học không tồn tại", statusCode: System.Net.HttpStatusCode.NotFound);
 
+            var infoProxy = _infoProxy.Find(x => x.Id == FormData.InfoProxyId);
             if (infoProxy == null)
                 return HttpResponse.Error(message: "Proxy không tồn tại", statusCode: System.Net.HttpStatusCode.NotFound);
 
@@ -54,9 +53,9 @@ namespace Domain.Services
                 AccountId = FormData.AccountId,
                 ClassesId = FormData.ClassesId,
                 StatusRegister = Register_Enum.NotRegistered,
-                CountFailed = FormData.CountFailed,
-                __RequestVerificationToken = FormData.__RequestVerificationToken,
-                Status = FormData.Status,
+                CountFailed = 0,
+                __RequestVerificationToken = string.Empty,
+                Status = string.Empty,
                 InfoProxyId = FormData.InfoProxyId,
                 CreatedDate = DateTime.UtcNow,
                 CreatedBy = userMeToken?.Username
@@ -67,20 +66,47 @@ namespace Domain.Services
 
             return HttpResponse.OK(message: "Đăng ký lớp học thành công", statusCode: System.Net.HttpStatusCode.OK);
         }
-        public async Task<HttpResponse> UpdateAsync(long? id, AccountClassRequest FormData)
+        public async Task<HttpResponse> UpdateAsync(long? id, AccountClassUpdateRequest FormData)
         {
             var accountClass = _accountClasses.Find(x => x.Id == id);
-
             if (accountClass == null)
                 return HttpResponse.Error(message: "Đăng ký lớp học không tồn tại", statusCode: System.Net.HttpStatusCode.NotFound);
 
-            accountClass.AccountId = FormData.AccountId;
-            accountClass.ClassesId = FormData.ClassesId;
-            accountClass.StatusRegister = (Register_Enum)EnumExtensions.GetEnumValueFromDisplayName<Register_Enum>(FormData.StatusRegister);
-            accountClass.CountFailed = FormData.CountFailed;
-            accountClass.__RequestVerificationToken = FormData.__RequestVerificationToken;
-            accountClass.Status = FormData.Status;
-            accountClass.InfoProxyId = FormData.InfoProxyId;
+            if(FormData.AccountId != null && accountClass.AccountId != FormData.AccountId)
+            {
+                var account = _account.Find(x => x.Id == FormData.AccountId);
+                if (account == null)
+                    return HttpResponse.Error(message: "Tài khoản không tồn tại", statusCode: System.Net.HttpStatusCode.NotFound);
+
+                accountClass.AccountId = account.Id;
+                accountClass.Account = account;
+            }
+
+            if (FormData.ClassesId != null && accountClass.ClassesId != FormData.ClassesId)
+            {
+                var classes = _classes.Find(x => x.Id == FormData.ClassesId);
+                if (classes == null)
+                    return HttpResponse.Error(message: "Lớp học không tồn tại", statusCode: System.Net.HttpStatusCode.NotFound);
+                
+                accountClass.Classes = classes; 
+                accountClass.ClassesId = classes.Id;
+            }
+
+            if (FormData.InfoProxyId != null && accountClass.InfoProxyId != FormData.InfoProxyId)
+            {
+                var infoProxy = _infoProxy.Find(x => x.Id == FormData.InfoProxyId);
+                if (infoProxy == null)
+                    return HttpResponse.Error(message: "Proxy không tồn tại", statusCode: System.Net.HttpStatusCode.NotFound);
+
+                accountClass.InfoProxyId = infoProxy.Id;
+                accountClass.InfoProxy = infoProxy;
+            }
+
+            accountClass.StatusRegister = EnumExtensions.GetEnumValueFromDisplayName<Register_Enum>(FormData.StatusRegister, Register_Enum.Pending);
+            accountClass.CountFailed = FormData.CountFailed ?? accountClass.CountFailed;
+            accountClass.__RequestVerificationToken = FormData.__RequestVerificationToken ?? accountClass.__RequestVerificationToken;
+            accountClass.Status = FormData.Status ?? accountClass.Status;
+
             accountClass.ModifiedDate = DateTime.UtcNow;
             accountClass.ModifiedBy = userMeToken?.Username;
 

@@ -32,7 +32,6 @@ namespace Domain.Services
         public async Task<HttpResponse> CreateAsync(HistoryMoneyRequest FormData)
         {
             var user = _user.Find(u => u.Id == FormData.UserId);
-
             if (user == null)
                 return HttpResponse.Error(message: "Tài khoản không tồn tại", statusCode: System.Net.HttpStatusCode.NotFound);
 
@@ -57,6 +56,16 @@ namespace Domain.Services
 
             if (history == null)
                 return HttpResponse.Error(message: "Lịch sử thay đổi tiền không tồn tại", statusCode: System.Net.HttpStatusCode.NotFound);
+
+            if(history.UserId != null && history.UserId != FormData.UserId)
+            {
+                var user = _user.Find(u => u.Id == FormData.UserId);
+                if (user == null)
+                    return HttpResponse.Error(message: "Tài khoản không tồn tại", statusCode: System.Net.HttpStatusCode.NotFound);
+
+                history.UserId = user.Id;
+                history.User = user;    
+            }
 
             history.Money = FormData.Money;
             history.Title = FormData.Title;

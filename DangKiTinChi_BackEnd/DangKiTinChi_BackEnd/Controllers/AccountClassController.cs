@@ -27,7 +27,7 @@ namespace DangKiTinChi_BackEnd.Controllers
             return response.ToActionResult();
         }
         [HttpPatch("{Id}")]
-        public async Task<IActionResult> UpdateAsync(long? Id, AccountClassRequest FormData)
+        public async Task<IActionResult> UpdateAsync(long? Id, AccountClassUpdateRequest FormData)
         {
             if (!ModelState.IsValid)
                 return BadRequest(DefaultString.INVALID_MODEL);
