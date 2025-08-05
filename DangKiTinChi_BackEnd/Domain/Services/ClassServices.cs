@@ -120,14 +120,15 @@ namespace Domain.Services
 
             if (!string.IsNullOrEmpty(search))
             {
+                search = search.ToLower();
                 query = query.Where(w => w.Name.ToLower().Contains(search) ||
                                         w.Day.ToString().Contains(search) ||
                                         w.StartTime.ToString().Contains(search) ||
                                         w.EndTime.ToString().Contains(search) ||
                                         w.Room.Contains(search) ||
                                         w.MaxStudent.ToString().Contains(search) ||
-                                        w.Lecturer.Name.ToString().Contains(search) ||
-                                        w.Course.Name.ToString().Contains(search));
+                                        w.Lecturer.Name.ToString().ToLower().Contains(search) ||
+                                        w.Course.Name.ToString().ToLower().Contains(search));
             }
 
             var TotalRecords = await query.CountAsync();
@@ -155,6 +156,5 @@ namespace Domain.Services
 
             return (courseSearch, TotalRecords);
         }
-
     }
 }

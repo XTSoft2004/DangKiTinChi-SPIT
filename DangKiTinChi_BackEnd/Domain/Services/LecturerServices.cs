@@ -73,6 +73,7 @@ namespace Domain.Services
 
             if (!string.IsNullOrEmpty(search))
             {
+                search = search.ToLower();
                 query = query.Where(x => x.Name.ToLower().Contains(search));
             }
 

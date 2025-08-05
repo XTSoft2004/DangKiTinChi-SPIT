@@ -25,6 +25,7 @@ namespace Domain.Entities
         // Số lượt đăng kí thất bại
         public int? CountFailed { get; set; }
         // Trạng thái hiện tại của lớp
+        public string? __RequestVerificationToken { get; set; }
         public string? Status { get; set; }
 
         // Liên kết với InfoProxy (nếu có)

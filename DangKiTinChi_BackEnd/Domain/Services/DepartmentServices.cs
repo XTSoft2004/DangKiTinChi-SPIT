@@ -77,7 +77,8 @@ namespace Domain.Services
 
             if (!string.IsNullOrEmpty(search))
             {
-                query = query.Where(d => d.Name.Contains(search) || d.Code.Contains(search));
+                search = search.ToLower();
+                query = query.Where(d => d.Name.ToLower().Contains(search) || d.Code.ToLower().Contains(search));
             }
 
             var TotalRecords = await query.CountAsync();
