@@ -34,7 +34,7 @@ namespace Domain.Services
             var infoProxy = new InfoProxy
             {
                 Proxy = FormData.Proxy,
-                TypeProxy = FormData.TypeProxy,
+                TypeProxy = EnumExtensions.GetEnumValueFromDisplayName(FormData.TypeProxy, ModelsHelper.TypeProxy.Http),
                 Status = Status_Proxy_Enum.Active,
                 CreatedDate = DateTime.Now,
                 CreatedBy = userMeToken?.Username,
@@ -61,7 +61,7 @@ namespace Domain.Services
             }
 
             infoProxy.Proxy = FormData.Proxy;
-            infoProxy.TypeProxy = FormData.TypeProxy;
+            infoProxy.TypeProxy = EnumExtensions.GetEnumValueFromDisplayName(FormData.TypeProxy, ModelsHelper.TypeProxy.Http);
             infoProxy.ModifiedDate = DateTime.Now;
             infoProxy.ModifiedBy = userMeToken?.Username;
 
@@ -93,7 +93,7 @@ namespace Domain.Services
             {
                 search = search.ToLower();
                 query = query.Where(x => x.Proxy.Contains(search)
-                                    || x.TypeProxy.Contains(search)
+                                    || x.TypeProxy.ToString().Contains(search)
                                     || x.Status.GetEnumDisplayName().ToLower().Contains(search));
             }
 
@@ -110,7 +110,7 @@ namespace Domain.Services
             {
                 Id = x.Id,
                 Proxy = x.Proxy,
-                TypeProxy = x.TypeProxy,
+                TypeProxy = x.TypeProxy.ToString(),
                 Status = x.Status.GetEnumDisplayName(),
             }).ToListAsync();
 

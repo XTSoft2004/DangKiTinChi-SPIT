@@ -32,7 +32,8 @@ builder.Services.AddSwaggerGen(options =>
         Version = "v1",
         Description = "API DangKiTinChi for SPIT-Document system"
     });
-    // ✅ Cấu hình Bearer Token cho Swagger
+
+    // ✅ Định nghĩa Bearer token (hiển thị trên Swagger UI)
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",
@@ -40,25 +41,12 @@ builder.Services.AddSwaggerGen(options =>
         Scheme = "Bearer",
         BearerFormat = "JWT",
         In = ParameterLocation.Header,
-        Description = "Nhập token vào đây: Bearer {your_token}"
+        Description = "Nhập token vào đây theo định dạng: Bearer {your_token}"
     });
 
-    // ✅ Bắt buộc sử dụng JWT khi gọi API
-    options.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            },
-            Array.Empty<string>()
-        }
-    });
+    // ❌ KHÔNG thêm AddSecurityRequirement ở đây (nó sẽ áp dụng cho tất cả API)
 
+    // ✅ Thêm OperationFilter để chỉ áp dụng với các API có [Authorize]
     options.OperationFilter<AuthorizeCheckOperationFilter>();
 });
 #endregion
@@ -98,7 +86,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 #endregion
-
 
 builder.Services.AddAuthorization(); // Bật Authorization
 builder.Services.AddControllers(); // Thêm Controller

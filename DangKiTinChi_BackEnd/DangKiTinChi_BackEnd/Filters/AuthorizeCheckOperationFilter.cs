@@ -4,19 +4,23 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Collections.Generic;
 using System.Linq;
 
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.SwaggerGen;
+using System.Reflection;
+
 public class AuthorizeCheckOperationFilter : IOperationFilter
 {
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {
-        // Kiểm tra xem API có `[Authorize]` hay không
-        var hasAuthorize = context.MethodInfo.DeclaringType.GetCustomAttributes(true)
-            .OfType<AuthorizeAttribute>()
-            .Any() ||
-            context.MethodInfo.GetCustomAttributes(true)
-            .OfType<AuthorizeAttribute>()
-            .Any();
+        // Kiểm tra có [Authorize] và không có [AllowAnonymous]
+        var hasAuthorize = context.MethodInfo.DeclaringType?.GetCustomAttributes(true).OfType<AuthorizeAttribute>().Any() == true
+                        || context.MethodInfo.GetCustomAttributes(true).OfType<AuthorizeAttribute>().Any();
 
-        if (hasAuthorize)
+        var allowAnonymous = context.MethodInfo.DeclaringType?.GetCustomAttributes(true).OfType<AllowAnonymousAttribute>().Any() == true
+                          || context.MethodInfo.GetCustomAttributes(true).OfType<AllowAnonymousAttribute>().Any();
+
+        if (hasAuthorize && !allowAnonymous)
         {
             operation.Security = new List<OpenApiSecurityRequirement>
             {
@@ -31,7 +35,7 @@ public class AuthorizeCheckOperationFilter : IOperationFilter
                                 Id = "Bearer"
                             }
                         },
-                        new List<string>()
+                        Array.Empty<string>()
                     }
                 }
             };
