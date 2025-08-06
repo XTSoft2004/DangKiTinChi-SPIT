@@ -2,6 +2,7 @@
 using Domain.Interfaces.Services;
 using Domain.Model.Request.Account;
 using Domain.Model.Request.AccountClass;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using static Domain.Common.AppConstants;
 
@@ -16,6 +17,8 @@ namespace DangKiTinChi_BackEnd.Controllers
         {
             this._accountClassServices = accountClassServices;
         }
+
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> CreateAsync(AccountClassRequest FormData)
         {
@@ -26,6 +29,7 @@ namespace DangKiTinChi_BackEnd.Controllers
 
             return response.ToActionResult();
         }
+        [Authorize]
         [HttpPatch("{Id}")]
         public async Task<IActionResult> UpdateAsync(long? Id, AccountClassUpdateRequest FormData)
         {
@@ -36,6 +40,7 @@ namespace DangKiTinChi_BackEnd.Controllers
 
             return response.ToActionResult();
         }
+        [Authorize]
         [HttpDelete("{Id}")]
         public async Task<IActionResult> DeleteAsync(long? Id)
         {
@@ -46,6 +51,7 @@ namespace DangKiTinChi_BackEnd.Controllers
 
             return response.ToActionResult();
         }
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetAllAsync(string search = "", int pageNumber = 1, int pageSize = 10)
         {

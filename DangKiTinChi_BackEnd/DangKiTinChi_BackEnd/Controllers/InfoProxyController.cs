@@ -1,5 +1,6 @@
 ﻿using Domain.Interfaces.Services;
 using Domain.Model.Request.InfoProxy;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using static Domain.Common.AppConstants;
 
@@ -7,6 +8,7 @@ namespace DangKiTinChi_BackEnd.Controllers
 {
     [Route("info-proxy")]
     [ApiController]
+    [Authorize]
     public class InfoProxyController : Controller
     {
         private readonly IInfoProxyServices _infoProxyServices;

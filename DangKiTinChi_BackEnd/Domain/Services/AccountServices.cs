@@ -1,4 +1,5 @@
 ﻿using Domain.Base.Services;
+using Domain.Common;
 using Domain.Common.API;
 using Domain.Common.Http;
 using Domain.Entities;

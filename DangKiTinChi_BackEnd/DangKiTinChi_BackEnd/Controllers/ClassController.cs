@@ -2,6 +2,7 @@
 using Domain.Entities;
 using Domain.Interfaces.Services;
 using Domain.Model.Request.Class;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using static Domain.Common.AppConstants;
 
@@ -9,6 +10,7 @@ namespace DangKiTinChi_BackEnd.Controllers
 {
     [Route("class")]
     [ApiController]
+    [Authorize]
     public class ClassController : Controller
     {
         private readonly IClassServices _services;

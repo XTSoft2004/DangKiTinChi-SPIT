@@ -3,6 +3,7 @@ using Domain.Entities;
 using Domain.Interfaces.Services;
 using Domain.Model.Request.Auth;
 using Domain.Model.Request.User;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using static Domain.Common.AppConstants;
 
@@ -10,6 +11,7 @@ namespace DangKiTinChi_BackEnd.Controllers
 {
     [Route("user")]
     [ApiController]
+    [Authorize]
     public class UserController : Controller
     {
         private readonly IUserServices? _services;

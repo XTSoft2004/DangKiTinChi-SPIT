@@ -10,6 +10,7 @@ namespace DangKiTinChi_BackEnd.Controllers
 {
     [Route("account")]
     [ApiController]
+    [Authorize]
     public class AccountController : Controller
     {
         private readonly IAccountServices _account;

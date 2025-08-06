@@ -1,6 +1,7 @@
 ﻿using Domain.Common.Http;
 using Domain.Interfaces.Services;
 using Domain.Model.Request.HistoryMoney;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using static Domain.Common.AppConstants;
 
@@ -8,6 +9,7 @@ namespace DangKiTinChi_BackEnd.Controllers
 {
     [Route("history-money")]
     [ApiController]
+    [Authorize]
     public class HistoryMoneyController : Controller
     {
         private readonly IHistoryMoneyServices _historyMoneyServices;
