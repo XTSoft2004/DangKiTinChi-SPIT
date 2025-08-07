@@ -4,6 +4,7 @@ using Infrastructure.ContextDB;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250806070405_DbRemove_Course_Department")]
+    partial class DbRemove_Course_Department
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -77,16 +80,6 @@ namespace Infrastructure.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Accounts");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = -1L,
-                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Password = "Xuantruong23*",
-                            UserId = -1L,
-                            UserName = "22T1020784"
-                        });
                 });
 
             modelBuilder.Entity("Domain.Entities.AccountClasses", b =>
@@ -159,6 +152,15 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("Day")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("EndTime")
+                        .HasColumnType("int");
+
+                    b.Property<long?>("LecturerId")
+                        .HasColumnType("bigint");
+
                     b.Property<long?>("MaxStudent")
                         .HasColumnType("bigint");
 
@@ -171,9 +173,17 @@ namespace Infrastructure.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Room")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("StartTime")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CourseId");
+
+                    b.HasIndex("LecturerId");
 
                     b.ToTable("Classes");
                 });
@@ -397,81 +407,6 @@ namespace Infrastructure.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Domain.Entities.Time", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("Day")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("EndTime")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ModifiedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Room")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("StartTime")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Time");
-                });
-
-            modelBuilder.Entity("Domain.Entities.TimeClass", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<long>("ClassId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long?>("ClassesId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ModifiedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<long>("TimeId")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ClassesId");
-
-                    b.HasIndex("TimeId");
-
-                    b.ToTable("TimeClass");
-                });
-
             modelBuilder.Entity("Domain.Entities.TokenUser", b =>
                 {
                     b.Property<long>("Id")
@@ -619,7 +554,13 @@ namespace Infrastructure.Migrations
                         .WithMany("Classes")
                         .HasForeignKey("CourseId");
 
+                    b.HasOne("Domain.Entities.Lecturer", "Lecturer")
+                        .WithMany("Classes")
+                        .HasForeignKey("LecturerId");
+
                     b.Navigation("Course");
+
+                    b.Navigation("Lecturer");
                 });
 
             modelBuilder.Entity("Domain.Entities.HistoryMoney", b =>
@@ -629,23 +570,6 @@ namespace Infrastructure.Migrations
                         .HasForeignKey("UserId");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Domain.Entities.TimeClass", b =>
-                {
-                    b.HasOne("Domain.Entities.Classes", "Classes")
-                        .WithMany("TimeClasses")
-                        .HasForeignKey("ClassesId");
-
-                    b.HasOne("Domain.Entities.Time", "Times")
-                        .WithMany("TimeClasses")
-                        .HasForeignKey("TimeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Classes");
-
-                    b.Navigation("Times");
                 });
 
             modelBuilder.Entity("Domain.Entities.TokenUser", b =>
@@ -668,11 +592,6 @@ namespace Infrastructure.Migrations
                     b.Navigation("Role");
                 });
 
-            modelBuilder.Entity("Domain.Entities.Classes", b =>
-                {
-                    b.Navigation("TimeClasses");
-                });
-
             modelBuilder.Entity("Domain.Entities.Courses", b =>
                 {
                     b.Navigation("Classes");
@@ -683,14 +602,14 @@ namespace Infrastructure.Migrations
                     b.Navigation("AccountClasses");
                 });
 
+            modelBuilder.Entity("Domain.Entities.Lecturer", b =>
+                {
+                    b.Navigation("Classes");
+                });
+
             modelBuilder.Entity("Domain.Entities.Role", b =>
                 {
                     b.Navigation("Users");
-                });
-
-            modelBuilder.Entity("Domain.Entities.Time", b =>
-                {
-                    b.Navigation("TimeClasses");
                 });
 
             modelBuilder.Entity("Domain.Entities.User", b =>

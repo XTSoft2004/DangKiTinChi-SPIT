@@ -11,6 +11,6 @@ namespace Domain.Entities
     {
         /// Tên giảng viên
         public string? Name { get; set; }
-        public ICollection<Classes>? Classes { get; set; }
+        //public ICollection<Classes>? Classes { get; set; }
     }
 }

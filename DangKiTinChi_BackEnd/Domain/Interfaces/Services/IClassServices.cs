@@ -21,15 +21,14 @@ namespace Domain.Interfaces.Services
         /// Cập nhật thông tin lớp học
         /// </summary>
         /// <param name="classId"></param>
-        /// <param name="classUpdateRequest"></param>
         /// <returns></returns>
-        Task<HttpResponse> UpdateAsync(long? classId, ClassUpdateRequest classUpdateRequest);
+        Task<HttpResponse> UpdateAsync(long classId);
         /// <summary>
         /// Xoá lớp học theo Id
         /// </summary>
         /// <param name="classId"></param>
         /// <returns></returns>
-        Task<HttpResponse> DeleteAsync(long? classId);
+        Task<HttpResponse> DeleteAsync(long classId);
         /// <summary>
         /// Lấy thông tin lớp học
         /// </summary>

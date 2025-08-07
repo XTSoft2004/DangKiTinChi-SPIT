@@ -14,23 +14,12 @@ namespace Domain.Entities
         public string? Code { get; set; }
         // Tên lớp học
         public string? Name { get; set; }
-        // Thứ học
-        public int? Day { get; set; }
-        // Thời gian bắt đầu
-        public int? StartTime { get; set; }
-        // Thời gian kết thúc
-        public int? EndTime { get; set; }
-        // Mã phòng học
-        public string? Room { get; set; }
         // Số lượng tối đa sinh viên
         public long? MaxStudent { get; set; }
 
-        public long? LecturerId { get; set; }
-        [ForeignKey(nameof(LecturerId))]
-        public Lecturer? Lecturer { get; set; }
-
         public long? CourseId { get; set; }
         [ForeignKey(nameof(CourseId))]
-        public Courses? Course { get; set; }
+        public virtual Courses? Course { get; set; }
+        public ICollection<TimeClass>? TimeClasses { get; set; }
     }
 }

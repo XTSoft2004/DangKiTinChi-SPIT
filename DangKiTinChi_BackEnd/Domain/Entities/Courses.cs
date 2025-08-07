@@ -17,10 +17,6 @@ namespace Domain.Entities
         // Số tín chỉ của môn học
         public int? Credit { get; set; }
 
-        public long? DepartmentId { get; set; }
-        [ForeignKey(nameof(DepartmentId))]
-        public Department? Department { get; set; }
-
         public ICollection<Classes>? Classes { get; set; }
     }
 }

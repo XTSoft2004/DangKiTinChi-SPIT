@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Server_Manager.Middleware;
+using System.Reflection;
 using System.Security.Claims;
 using System.Text;
 using WebApp.Configures.DIConfig;
@@ -48,6 +49,9 @@ builder.Services.AddSwaggerGen(options =>
 
     // ✅ Thêm OperationFilter để chỉ áp dụng với các API có [Authorize]
     options.OperationFilter<AuthorizeCheckOperationFilter>();
+
+    var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
 });
 #endregion
 

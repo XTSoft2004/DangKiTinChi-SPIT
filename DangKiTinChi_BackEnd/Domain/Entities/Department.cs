@@ -16,7 +16,5 @@ namespace Domain.Entities
         // Tên khoa
         [Required, StringLength(100)]
         public string? Name { get; set; }
-
-        public ICollection<Courses>? Courses { get; set; }
     }
 }

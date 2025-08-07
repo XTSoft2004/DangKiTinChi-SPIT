@@ -68,6 +68,18 @@ namespace Infrastructure.ContextDB
                    //CreatedDate = DateTime.UtcNow // Bỏ chú thích nếu cần
                }
             );
+
+            modelBuilder.Entity<Account>().HasData(
+                new Account
+                {
+                    Id = -1,
+                    UserName = "22T1020784",
+                    Password = "Xuantruong23*",
+                    FullName = "Trần Xuân Trường",
+                    DomainSchool = "student.husc.edu.vn",
+                    UserId = -1,
+                }
+            );
         }
     }
 }

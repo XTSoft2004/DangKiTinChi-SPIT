@@ -43,13 +43,13 @@ namespace DangKiTinChi_BackEnd.Controllers
             return response.ToActionResult();
         }
 
-        [HttpPatch("{CourseID}")]
-        public async Task<IActionResult> UpdateAsync(long? CourseID, CourseUpdateRequest courseUpdateRequest)
+        [HttpPost("{CourseID}")]
+        public async Task<IActionResult> UpdateAsync(long? CourseID)
         {
             if (!ModelState.IsValid)
                 return BadRequest(DefaultString.INVALID_MODEL);
 
-            var response = await _services.UpdateAsync(CourseID, courseUpdateRequest);
+            var response = await _services.UpdateAsync(CourseID);
             return response.ToActionResult();
         }
 

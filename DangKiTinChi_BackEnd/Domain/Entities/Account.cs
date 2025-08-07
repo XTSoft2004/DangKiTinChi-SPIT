@@ -32,6 +32,6 @@ namespace Domain.Entities
 
         public long? UserId { get; set; }
         [ForeignKey(nameof(UserId))]
-        public User? User { get; set; }
+        public virtual User? User { get; set; }
     }
 }

@@ -14,11 +14,11 @@ namespace Domain.Entities
         // Liên kết với Account
         [ForeignKey(nameof(AccountId))]
         public long? AccountId { get; set; }
-        public Account? Account { get; set; }
+        public virtual Account? Account { get; set; }
         // Liên kết với Classes
         [ForeignKey(nameof(ClassesId))]
         public long? ClassesId { get; set; }
-        public Classes? Classes { get; set; }
+        public virtual Classes? Classes { get; set; }
 
         // Trạng thái đăng ký lớp học
         public Register_Enum StatusRegister { get; set; }
@@ -32,6 +32,6 @@ namespace Domain.Entities
 
         [ForeignKey(nameof(InfoProxyId))]
         public long? InfoProxyId { get; set; }
-        public InfoProxy? InfoProxy { get; set; }
+        public virtual InfoProxy? InfoProxy { get; set; }
     }
 }

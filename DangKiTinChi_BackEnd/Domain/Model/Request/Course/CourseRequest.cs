@@ -10,9 +10,6 @@ namespace Domain.Model.Request.Course
     public class CourseRequest
     {
         public string? Code { get; set; }
-        public string? Name { get; set; }
-        public int? Credit { get; set; }
-
-        public long? DepartmentId { get; set; }
+        //public long? DepartmentId { get; set; }
     }
 }

@@ -29,4 +29,8 @@
     <ProjectReference Include="..\HelperHttpClient\HelperHttpClient.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="CourseClass\" />
+  </ItemGroup>
+
 </Project>

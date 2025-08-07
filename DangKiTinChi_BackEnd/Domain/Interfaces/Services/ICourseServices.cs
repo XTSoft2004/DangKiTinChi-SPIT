@@ -13,7 +13,7 @@ namespace Domain.Interfaces.Services
     {
         Task<HttpResponse> CreateAsync(CourseRequest courseRequest);
 
-        Task<HttpResponse> UpdateAsync(long? courseId, CourseUpdateRequest courseRequest);
+        Task<HttpResponse> UpdateAsync(long? courseId);
 
         Task<HttpResponse> DeleteAsync(long? courseId);
 

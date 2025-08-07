@@ -29,7 +29,7 @@ namespace Domain.Entities
         // Role Infomation
         public long? RoleId { get; set; }
         [ForeignKey(nameof(RoleId))]
-        public Role? Role { get; set; }
+        public virtual Role? Role { get; set; }
 
 
         public ICollection<TokenUser>? TokenUsers { get; set; }

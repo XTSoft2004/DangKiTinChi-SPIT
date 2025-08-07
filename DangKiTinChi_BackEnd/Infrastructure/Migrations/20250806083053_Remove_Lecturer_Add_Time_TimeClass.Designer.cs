@@ -4,6 +4,7 @@ using Infrastructure.ContextDB;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250806083053_Remove_Lecturer_Add_Time_TimeClass")]
+    partial class Remove_Lecturer_Add_Time_TimeClass
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -77,16 +80,6 @@ namespace Infrastructure.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Accounts");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = -1L,
-                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Password = "Xuantruong23*",
-                            UserId = -1L,
-                            UserName = "22T1020784"
-                        });
                 });
 
             modelBuilder.Entity("Domain.Entities.AccountClasses", b =>
@@ -442,7 +435,7 @@ namespace Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
-                    b.Property<long>("ClassId")
+                    b.Property<long?>("ClassId")
                         .HasColumnType("bigint");
 
                     b.Property<long?>("ClassesId")
@@ -460,7 +453,7 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime?>("ModifiedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<long>("TimeId")
+                    b.Property<long?>("TimeId")
                         .HasColumnType("bigint");
 
                     b.HasKey("Id");
@@ -639,9 +632,7 @@ namespace Infrastructure.Migrations
 
                     b.HasOne("Domain.Entities.Time", "Times")
                         .WithMany("TimeClasses")
-                        .HasForeignKey("TimeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("TimeId");
 
                     b.Navigation("Classes");
 

@@ -4,6 +4,11 @@ using Domain.Entities;
 using Domain.Interfaces.Repositories;
 using Domain.Interfaces.Services;
 using Domain.Model.Request.Account;
+using Domain.Model.Request.Class;
+using Domain.Model.Request.Course;
+using Domain.Model.Request.Time;
+using Domain.Model.Response.Class;
+using Domain.Model.Response.Course;
 using Domain.Model.Response.User;
 using HtmlAgilityPack;
 using System;
@@ -89,6 +94,8 @@ namespace Domain.Common.API
                 accountMe.Cookie = _request.Client.GetCookies($"https://{accountMe.DomainSchool}");
                 _account.Update(accountMe);
                 await UnitOfWork.CommitAsync();
+                // Lấy các thông tin cá nhân
+                await GetNameStudent();
                 return true;
             }
 
@@ -107,6 +114,9 @@ namespace Domain.Common.API
                 doc.LoadHtml(content);
 
                 string fullname = doc.DocumentNode.SelectSingleNode("//div[@class=\"hitec-information\"]//h5")?.InnerText;
+                if (string.IsNullOrEmpty(fullname))
+                    return false;
+
                 string semeterName = doc.DocumentNode.SelectSingleNode("/html/body/div[1]/div[3]/div/a/text()[4]")?.InnerText;
                 accountMe.FullName = fullname.Trim();
                 accountMe.SemeterName = semeterName.Trim();
@@ -116,6 +126,63 @@ namespace Domain.Common.API
                 return true;    
             }
             return false;
+        }
+        public async Task<CourseResponse> GetInfoCourse(string courseCode)
+        {
+            var response = await _request.Client.GetAsync($"https://{accountMe.DomainSchool}/Studying/Courses/{courseCode}/");
+            if (response.IsSuccessStatusCode)
+            {
+                string content = _request.Client.Content;
+                content = HtmlEntity.DeEntitize(_request.Client.Content);
+
+                HtmlDocument doc = new HtmlDocument();
+                doc.LoadHtml(content);
+
+                string nameCourse = doc.DocumentNode.SelectSingleNode("/html/body/div[2]/div[2]/div/div/div/div[3]/div[1]/div/p")?.InnerText;
+                string codeCourse = doc.DocumentNode.SelectSingleNode("/html/body/div[2]/div[2]/div/div/div/div[3]/div[2]/div[1]/p")?.InnerText;
+                string credit = doc.DocumentNode.SelectSingleNode("/html/body/div[2]/div[2]/div/div/div/div[3]/div[2]/div[2]/p")?.InnerText;
+
+                CourseResponse courseRequest = new CourseResponse()
+                {
+                    Name = nameCourse?.Trim(),
+                    Code = codeCourse?.Trim(),
+                    Credit = Convert.ToInt32(credit)
+                };
+
+                return courseRequest;
+            }
+
+            return null;
+        }
+        public async Task<ClassCheckResponse> GetInfoClass(string classCode)
+        {
+            var response = await _request.Client.GetAsync($"https://{accountMe.DomainSchool}/Course/Details/{classCode}/");
+            if (response.IsSuccessStatusCode)
+            {
+                string content = _request.Client.Content;
+                content = HtmlEntity.DeEntitize(_request.Client.Content);
+
+                HtmlDocument doc = new HtmlDocument();
+                doc.LoadHtml(content);
+
+                string nameClass = doc.DocumentNode.SelectSingleNode("//*[@id=\"courseInformation\"]/fieldset[1]/div[1]/div/p")?.InnerText;
+                string nameLecturer = doc.DocumentNode.SelectSingleNode("//*[@id=\"courseInformation\"]/fieldset[1]/div[3]/div/p")?.InnerText;
+                string thoikhoabieu = doc.DocumentNode.SelectSingleNode("//*[@id=\"courseInformation\"]/fieldset[2]/div[3]/div/p")?.InnerText;
+                string maxStudent = doc.DocumentNode.SelectSingleNode("//*[@id=\"courseInformation\"]/fieldset[2]/div[5]/div/p/span[2]")?.InnerText;
+                string courseName = nameClass?.Split('-')?[0]?.Trim();
+                 
+                ClassCheckResponse classCheckResponse = new ClassCheckResponse()
+                {
+                    Code = classCode,
+                    CourseName = courseName,
+                    Name = nameClass,
+                    MaxStudent = Convert.ToInt32(maxStudent.Replace("Tối đa: ", "")),
+                    TimesRequest = AppFunction.ConvertTextToTimeClass(thoikhoabieu),
+                };
+                return classCheckResponse;
+            }
+
+            return null;
         }
     }
 }

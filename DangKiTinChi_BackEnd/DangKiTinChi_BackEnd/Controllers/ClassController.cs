@@ -42,18 +42,22 @@ namespace DangKiTinChi_BackEnd.Controllers
             return response.ToActionResult();
         }
 
-        [HttpPatch("{ClassID}")]
-        public async Task<IActionResult> UpdateAsync(long? ClassID, ClassUpdateRequest classUpdateRequest)
+        /// <summary>
+        /// Cập nhật thông tin của lớp học theo mã lớp học (ClassID).
+        /// </summary>
+        /// <remarks>Cập nhật thông tin của lớp học theo mã lớp học (ClassID).</remarks>
+        [HttpPost("{ClassID}")]
+        public async Task<IActionResult> UpdateAsync(long ClassID)
         {
             if (!ModelState.IsValid)
                 return BadRequest(DefaultString.INVALID_MODEL);
 
-            var response = await _services.UpdateAsync(ClassID, classUpdateRequest);
+            var response = await _services.UpdateAsync(ClassID);
             return response.ToActionResult();
         }
 
         [HttpDelete("{ClassID}")]
-        public async Task<IActionResult> DeleteAsync(long? ClassID)
+        public async Task<IActionResult> DeleteAsync(long ClassID)
         {
             if (!ModelState.IsValid)
                 return BadRequest(DefaultString.INVALID_MODEL);

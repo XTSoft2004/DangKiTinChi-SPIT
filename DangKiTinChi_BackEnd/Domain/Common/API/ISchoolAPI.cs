@@ -1,4 +1,7 @@
 ﻿using Domain.Model.Request.Account;
+using Domain.Model.Request.Class;
+using Domain.Model.Request.Course;
+using Domain.Model.Response.Course;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,5 +24,23 @@ namespace Domain.Common.API
         /// <param name="AccountId"></param>
         /// <returns></returns>
         Task<bool> LoginAccount(long? AccountId);
+        /// <summary>
+        /// Lấy thông tin của môn học đó
+        /// </summary>
+        /// <param name="courseCode"></param>
+        /// <returns></returns>
+        Task<CourseResponse> GetInfoCourse(string courseCode);
+        /// <summary>
+        /// Lấy thông tin của lớp học
+        /// </summary>
+        /// <param name="classCode"></param>
+        /// <returns></returns>
+        Task<ClassCheckResponse> GetInfoClass(string classCode);
+        /// <summary>
+        /// Đặt tài khoản account
+        /// </summary>
+        /// <param name="AccountId"></param>
+        /// <returns></returns>
+        Task SetAccount(long? AccountId);
     }
 }

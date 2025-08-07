@@ -1,17 +1,24 @@
 ﻿using Domain.Base.Services;
+using Domain.Common;
+using Domain.Common.API;
 using Domain.Common.Http;
 using Domain.Entities;
 using Domain.Interfaces.Repositories;
 using Domain.Interfaces.Services;
 using Domain.Model.Request.Class;
+using Domain.Model.Request.Course;
+using Domain.Model.Request.Time;
 using Domain.Model.Response.Class;
 using Domain.Model.Response.Course;
 using Domain.Model.Response.User;
 using Microsoft.EntityFrameworkCore;
+using Sprache;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Domain.Services
@@ -19,18 +26,26 @@ namespace Domain.Services
     public class ClassServices : BaseService, IClassServices
     {
         private readonly IRepositoryBase<Classes> _class;
-        private readonly IRepositoryBase<Lecturer> _lecturer;
+        private readonly IRepositoryBase<TimeClass> _timeClass;
         private readonly IRepositoryBase<Courses> _course;
+        private readonly IRepositoryBase<Time> _time;
         private readonly ITokenServices _tokenServices;
+        private readonly ITimeServices _timeServices;
+        private readonly ICourseServices _courseServices;
         private UserTokenResponse? userMeToken;
-
-        public ClassServices(IRepositoryBase<Classes> @class, ITokenServices tokenServices, IRepositoryBase<Lecturer> lecturer, IRepositoryBase<Courses> course)
+        private readonly ISchoolAPI _schoolAPI;
+        public ClassServices(IRepositoryBase<Classes> @class, ITokenServices tokenServices, IRepositoryBase<Courses> course, ITimeServices timeServices, IRepositoryBase<TimeClass> timeClass, ISchoolAPI schoolAPI, IRepositoryBase<Time> time, ICourseServices courseServices)
         {
             _class = @class;
-            _lecturer = lecturer;
             _course = course;
             _tokenServices = tokenServices;
+            _timeServices = timeServices;
             userMeToken = _tokenServices.GetTokenBrowser();
+            _timeClass = timeClass;
+            _schoolAPI = schoolAPI;
+            _schoolAPI.SetAccount(-1).GetAwaiter().GetResult();
+            _time = time;
+            _courseServices = courseServices;
         }
 
         public async Task<HttpResponse> CreateAsync(ClassRequest classRequest)
@@ -39,65 +54,117 @@ namespace Domain.Services
             if (existingClass != null)
                 return HttpResponse.Error("Lớp học đã tồn tại!", System.Net.HttpStatusCode.Conflict);
 
-            var lecturer = await _lecturer.FindAsync(f => f.Id == classRequest.LecturerId);
-            if (lecturer == null)
-                return HttpResponse.Error("Giảng viên không tồn tại!", System.Net.HttpStatusCode.NotFound);
+            var classCheck = await _schoolAPI.GetInfoClass(classRequest.Code);
+            if (classCheck == null)
+                return HttpResponse.Error("Mã lớp đã xảy ra lỗi, vui lòng kiểm tra lại!");
 
-            var course = await _course.FindAsync(f => f.Id == classRequest.CourseId);
+            ReloadCourse:
+            var course = await _course.FindAsync(f => f.Name == classCheck.CourseName);
             if (course == null)
-                return HttpResponse.Error("Khóa học không tồn tại!", System.Net.HttpStatusCode.NotFound);
+            {
+                string pattern = @"\d{4}-\d{4}\.\d\.(.*?)\.\d+";
+                Match match = Regex.Match(classRequest.Code, pattern);
+                if (match.Success)
+                {
+                    string courseCode = match.Groups[1].Value;
+                    var courseRegister = await _courseServices.CreateAsync(new CourseRequest()
+                    {
+                        Code = courseCode
+                    });
+                    if (courseRegister.StatusCode != (int)HttpStatusCode.Created)
+                        return HttpResponse.Error("Không thể tạo khóa học mới, vui lòng kiểm tra lại mã lớp học!");
+                    goto ReloadCourse;
+                }
+            }
+
+            List<Time> times = times = await _timeServices.CheckTimeExist(classCheck.TimesRequest);
+            if (times.Count == 0)
+                return HttpResponse.Error("Kiểm tra các thời gian không hợp lệ, vui lòng kiểm tra lại");
 
             var newClass = new Classes()
             {
-                Code = classRequest.Code,
-                Name = classRequest.Name,
-                Day = classRequest.Day,
-                StartTime = classRequest.StartTime,
-                EndTime = classRequest.EndTime,
-                Room = classRequest.Room,
-                MaxStudent = classRequest.MaxStudent,
+                Code = classCheck.Code,
+                Name = classCheck.Name,
+                MaxStudent = classCheck.MaxStudent,
 
-                LecturerId = lecturer.Id,
-                Lecturer = lecturer,
                 Course = course,
                 CourseId = course.Id,
 
                 CreatedBy = userMeToken?.Username,
                 CreatedDate = DateTime.Now
             };
-
             _class.Insert(newClass);
             await UnitOfWork.CommitAsync();
-            return HttpResponse.OK(message: "Tạo lớp học thành công!", statusCode: System.Net.HttpStatusCode.Created);
+
+            foreach(var time in times)
+            {
+                _timeClass.Insert(new TimeClass()
+                {
+                    ClassId = newClass.Id,
+                    Classes = newClass,
+                    TimeId = time.Id,
+                    Times = time
+                });
+            }
+            await UnitOfWork.CommitAsync();
+
+            return HttpResponse.OK(message: $"Tạo lớp học {classCheck.Name} thành công!", statusCode: System.Net.HttpStatusCode.Created);
         }
-        public async Task<HttpResponse> UpdateAsync(long? classId, ClassUpdateRequest classUpdateRequest)
+        public async Task<HttpResponse> UpdateAsync(long classId)
         {
             var existingClass = await _class.FindAsync(f => f.Id == classId);
             if (existingClass == null)
                 return HttpResponse.Error("Lớp học không tồn tại!", System.Net.HttpStatusCode.NotFound);
-            existingClass.Name = classUpdateRequest.Name ?? existingClass.Name;
-            existingClass.Day = classUpdateRequest.Day ?? existingClass.Day;
-            existingClass.StartTime = classUpdateRequest.StartTime ?? existingClass.StartTime;
-            existingClass.EndTime = classUpdateRequest.EndTime ?? existingClass.EndTime;
-            existingClass.Room = classUpdateRequest.Room ?? existingClass.Room;
-            existingClass.MaxStudent = classUpdateRequest.MaxStudent ?? existingClass.MaxStudent;
+           
 
-            if(existingClass.LecturerId != classUpdateRequest.LecturerId)
+            var classCheck = await _schoolAPI.GetInfoClass(existingClass.Code);
+            if (classCheck == null)
+                return HttpResponse.Error("Mã lớp đã xảy ra lỗi, vui lòng kiểm tra lại!");
+
+            ReloadCourse:
+            var course = await _course.FindAsync(f => f.Name == classCheck.CourseName);
+            if (course == null)
             {
-                var lecturer = await _lecturer.FindAsync(f => f.Id == classUpdateRequest.LecturerId);
-                if (lecturer == null)
-                    return HttpResponse.Error("Giảng viên không tồn tại!", System.Net.HttpStatusCode.NotFound);
-                
-                existingClass.LecturerId = lecturer.Id;
-                existingClass.Lecturer = lecturer;
+                string pattern = @"\d{4}-\d{4}\.\d\.(.*?)\.\d+";
+                Match match = Regex.Match(existingClass.Code, pattern);
+                if (match.Success)
+                {
+                    string courseCode = match.Groups[1].Value;
+                    var courseRegister = await _courseServices.CreateAsync(new CourseRequest()
+                    {
+                        Code = courseCode
+                    });
+                    if (courseRegister.StatusCode != (int)HttpStatusCode.Created)
+                        return HttpResponse.Error("Không thể tạo khóa học mới, vui lòng kiểm tra lại mã lớp học!");
+                    goto ReloadCourse;
+                }
             }
 
-            if(existingClass.CourseId != classUpdateRequest.CourseId)
+            List<Time> times = times = await _timeServices.CheckTimeExist(classCheck.TimesRequest);
+            if (times.Count == 0)
+                return HttpResponse.Error("Kiểm tra các thời gian không hợp lệ, vui lòng kiểm tra lại");
+
+            #region Xử lý thời gian lớp học
+            var listTimeClass = _timeClass.ListBy(l => l.ClassId == classId).Select(s => s.TimeId).ToList();
+            var timeIdRemove = listTimeClass.Except(times.Select(s => s.Id)).ToList();
+            var timeClassRemove = _timeClass.ListBy(l => timeIdRemove.Contains(l.TimeId));
+            _timeClass.DeleteRange(timeClassRemove);
+
+            var timeIdAdd = times.Select(s => s.Id).Except(listTimeClass).ToList();
+            _timeClass.InsertRange(new List<TimeClass>(timeIdAdd.Select(s => new TimeClass()
             {
-                var course = await _course.FindAsync(f => f.Id == classUpdateRequest.CourseId);
-                if (course == null)
-                    return HttpResponse.Error("Khóa học không tồn tại!", System.Net.HttpStatusCode.NotFound);
-                
+                TimeId = s,
+                ClassId = classId
+            })));
+            await UnitOfWork.CommitAsync();
+            #endregion
+
+
+            existingClass.Name = classCheck.Name ?? existingClass.Name;
+            existingClass.MaxStudent = classCheck.MaxStudent ?? existingClass.MaxStudent;
+            
+            if(existingClass.CourseId != course.Id)
+            {
                 existingClass.CourseId = course.Id;
                 existingClass.Course = course;
             }
@@ -107,7 +174,7 @@ namespace Domain.Services
             return HttpResponse.OK(message: "Cập nhật lớp học thành công!", statusCode: System.Net.HttpStatusCode.OK);
         }
 
-        public async Task<HttpResponse> DeleteAsync(long? classId)
+        public async Task<HttpResponse> DeleteAsync(long classId)
         {
             var existingClass = await _class.FindAsync(f => f.Id == classId);
             if (existingClass == null)
@@ -122,19 +189,15 @@ namespace Domain.Services
         {
             var query = _class.All()
                 .Include(c => c.Course)
-                .Include(c => c.Lecturer)
+                //.Include(c => c.Lecturer)
                 .AsQueryable();
 
             if (!string.IsNullOrEmpty(search))
             {
                 search = search.ToLower();
                 query = query.Where(w => w.Name.ToLower().Contains(search) ||
-                                        w.Day.ToString().Contains(search) ||
-                                        w.StartTime.ToString().Contains(search) ||
-                                        w.EndTime.ToString().Contains(search) ||
-                                        w.Room.Contains(search) ||
                                         w.MaxStudent.ToString().Contains(search) ||
-                                        w.Lecturer.Name.ToString().ToLower().Contains(search) ||
+                                        //w.Lecturer.Name.ToString().ToLower().Contains(search) ||
                                         w.Course.Name.ToString().ToLower().Contains(search));
             }
 
@@ -152,12 +215,8 @@ namespace Domain.Services
                 Id = x.Id,
                 Code = x.Code,
                 Name = x.Name,
-                Day = x.Day,
-                StartTime = x.StartTime,
-                EndTime = x.EndTime,
-                Room = x.Room,
                 MaxStudent = x.MaxStudent,
-                LecturerName = x.Lecturer.Name,
+                //LecturerName = x.Lecturer.Name,
                 CourseName = x.Course.Name
             }).ToListAsync();
 
