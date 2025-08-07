@@ -54,5 +54,18 @@ namespace Domain.Common
             if (request == null) return "";
             return $"{request.Scheme}://{request.Host}{request.Path}{request.QueryString}";
         }
+        /// <summary>
+        /// Lấy ID tài khoản từ header "X-Account-Id"
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        public long? GetAccountId()
+        {
+            var accountIdStr = _httpContextAccessor?.HttpContext.Request.Headers["X-Account-Id"].FirstOrDefault();
+            if (long.TryParse(accountIdStr, out long accountId))
+                return accountId;
+
+            return null;
+        }
     }
 }

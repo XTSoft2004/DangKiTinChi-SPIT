@@ -15,10 +15,8 @@ namespace Infrastructure.ContextDB
         public DbSet<Account> Accounts { get; set; }
         public DbSet<Classes> Classes { get; set; }
         public DbSet<Courses> Courses { get; set; }
-        public DbSet<Department> Departments { get; set; }
         public DbSet<HistoryMoney> HistoryMoneys { get; set; }
         public DbSet<InfoProxy> InfoProxys { get; set; }
-        public DbSet<Lecturer> Lecturers { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<User> Users { get; set; }
 
@@ -76,7 +74,19 @@ namespace Infrastructure.ContextDB
                     UserName = "22T1020784",
                     Password = "Xuantruong23*",
                     FullName = "Trần Xuân Trường",
-                    DomainSchool = "student.husc.edu.vn",
+                    SchoolEnum = School_Enum.HUSC,
+                    UserId = -1,
+                }
+            );
+
+            modelBuilder.Entity<Account>().HasData(
+                new Account
+                {
+                    Id = -2,
+                    UserName = "22F7510310",
+                    Password = "Thanhthanh@1",
+                    FullName = "Nguyễn Thị Cẩm Thanh",
+                    SchoolEnum = School_Enum.HUFIS,
                     UserId = -1,
                 }
             );

@@ -17,6 +17,15 @@ namespace Domain.Common
 {
     public class AppFunction
     {
+        public static string GetDomainSchool(School_Enum school_Enum)
+        {
+            if(school_Enum == School_Enum.HUSC)
+                return "student.husc.edu.vn";
+            else if (school_Enum == School_Enum.HUFIS)
+                return "student.huflis.edu.vn";
+         
+            return string.Empty;
+        }
         public static Role GetRoleName(long? RoleId)
         {
             return LoadRolesBackground.Roles != null

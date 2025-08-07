@@ -1,6 +1,7 @@
 ﻿using Domain.Base.Services;
 using Domain.Common.HttpRequest;
 using Domain.Entities;
+using Domain.Interfaces.Common;
 using Domain.Interfaces.Repositories;
 using Domain.Interfaces.Services;
 using Domain.Model.Request.Account;
@@ -10,6 +11,7 @@ using Domain.Model.Request.Time;
 using Domain.Model.Response.Class;
 using Domain.Model.Response.Course;
 using Domain.Model.Response.User;
+using HelperHttpClient;
 using HtmlAgilityPack;
 using System;
 using System.Collections.Generic;
@@ -27,8 +29,9 @@ namespace Domain.Common.API
     {
         private readonly IHttpRequestHelper _request;
         private readonly IRepositoryBase<Account> _account;
-        private Account accountMe;
-
+        private readonly IHttpContextHelper _httpContextHelper;
+        private readonly AsyncLocal<Account> accountMe = new();
+        private readonly AsyncLocal<string> UrlBase = new();
         public Dictionary<string, string> headersDefault = new Dictionary<string, string>()
         {
             {"Accept","text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7"},
@@ -45,69 +48,70 @@ namespace Domain.Common.API
             {"User-Agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"},
         };
 
-        public SchoolAPI(IHttpRequestHelper request, IRepositoryBase<Account> account)
+        public SchoolAPI(IHttpRequestHelper request, IRepositoryBase<Account> account, IHttpContextHelper httpContextHelper)
         {
             _request = request;
             _account = account;
+            _httpContextHelper = httpContextHelper;
+            SetAccountContext();
         }
-        public async Task SetAccount(long? AccountId)
+        public void SetAccountContext()
         {
-            accountMe = await _account.FindAsync(f => f.Id == AccountId);
-            _request.SetAccount(accountMe);
-        }
-        public async Task<string> RefreshTokenLogin(string url)
-        {
-            _request.Client.SetHeader(headersDefault);
-            var responseMessageHome = await _request.Client.GetAsync(url);
-            if (responseMessageHome.IsSuccessStatusCode)
+            var account = _account.Find(f => f.Id == _httpContextHelper.GetAccountId());
+            if(account != null)
             {
-                string token = Regex.Match(_request.Client.Content, "name=\"__RequestVerificationToken\" type=\"hidden\" value=\"(.*?)\"").Groups[1].Value;
-                accountMe.__RequestVerificationToken = token;
-                _account.Update(accountMe);
-                await UnitOfWork.CommitAsync();
-                return token;
+                accountMe.Value = account;
+                UrlBase.Value = AppFunction.GetDomainSchool(account.SchoolEnum);
+                _request.SetAccount(account);
             }
-            return string.Empty;
         }
-
         public async Task<bool> LoginAccount(long? AccountId)
         {
-            await SetAccount(AccountId);
+            var accountLogin = await _account.FindAsync(f => f.Id == AccountId);
+            string UrlBase = AppFunction.GetDomainSchool(accountLogin.SchoolEnum);
 
-            if(await GetNameStudent())
-                return true;
-
-            if (string.IsNullOrEmpty(await RefreshTokenLogin($"https://{accountMe.DomainSchool}/Account/Login")))
+            RequestHttpClient _requestLogin = new RequestHttpClient();
+            _requestLogin.SetHeader(headersDefault);
+            await _requestLogin.GetAsync($"https://{UrlBase}/Account/Login");
+            string verificationToken = Regex.Match(_requestLogin.Content, "name=\"__RequestVerificationToken\" type=\"hidden\" value=\"(.*?)\"").Groups[1].Value;
+            if (string.IsNullOrEmpty(verificationToken))
                 return false;
 
             Dictionary<string, string> paramData = new()
             {
-                {"__RequestVerificationToken", accountMe?.__RequestVerificationToken},
-                {"loginID", accountMe?.UserName},
-                {"password", accountMe?.Password},
+                {"__RequestVerificationToken", verificationToken},
+                {"loginID", accountLogin.UserName},
+                {"password", accountLogin.Password},
             };
 
-            var responseMessage = await _request.Client.PostAsync($"https://{accountMe.DomainSchool}/Account/Login", paramData);
-            if (responseMessage.IsSuccessStatusCode && !_request.Client.Content.Contains("Đăng nhập hệ thống"))
+            var responseMessage = await _requestLogin.PostAsync($"https://{UrlBase}/Account/Login", paramData);
+            if (responseMessage.IsSuccessStatusCode && !_requestLogin.Content.Contains("Đăng nhập hệ thống"))
             {
-                var response = _request.Client.Content;
-                accountMe.Cookie = _request.Client.GetCookies($"https://{accountMe.DomainSchool}");
-                _account.Update(accountMe);
+                var response = _requestLogin.Content;
+                accountLogin.Cookie = _requestLogin.GetCookies($"https://{UrlBase}");
+                _account.Update(accountLogin);
                 await UnitOfWork.CommitAsync();
                 // Lấy các thông tin cá nhân
-                await GetNameStudent();
+                await GetNameStudent(_requestLogin, accountLogin);
                 return true;
             }
 
             return false;
         }
-        public async Task<bool> GetNameStudent()
+        public async Task<bool> GetNameStudent(RequestHttpClient _requestNew = null, Account account = null)
         {
-            var response = await _request.Client.GetAsync($"https://{accountMe.DomainSchool}/Account/UserProfile");
-            if (response.IsSuccessStatusCode && !String.IsNullOrEmpty(_request.Client.Content))
+            RequestHttpClient _requestProfile = null;
+            if (_requestNew != null)
+                _requestProfile = _requestNew;
+            else
+                _requestProfile = _request.Client;
+
+            string urlBase = AppFunction.GetDomainSchool(account.SchoolEnum);
+            var response = await _requestProfile.GetAsync($"https://{urlBase}/Account/UserProfile");
+            if (response.IsSuccessStatusCode && !String.IsNullOrEmpty(_requestProfile.Content))
             {
-                string content = _request.Client.Content;
-                content = HtmlEntity.DeEntitize(_request.Client.Content);
+                string content = _requestProfile.Content;
+                content = HtmlEntity.DeEntitize(_requestProfile.Content);
 
                 // Load the HTML content into an HTML document
                 HtmlDocument doc = new HtmlDocument();
@@ -118,18 +122,32 @@ namespace Domain.Common.API
                     return false;
 
                 string semeterName = doc.DocumentNode.SelectSingleNode("/html/body/div[1]/div[3]/div/a/text()[4]")?.InnerText;
-                accountMe.FullName = fullname.Trim();
-                accountMe.SemeterName = semeterName.Trim();
-                accountMe.Cookie = _request.Client.GetCookies($"https://{accountMe.DomainSchool}");
-                _account.Update(accountMe);
+                account.FullName = fullname.Trim();
+                account.SemeterName = semeterName.Trim();
+                account.Cookie = _requestProfile.GetCookies($"https://{urlBase}");
+                _account.Update(account);
                 await UnitOfWork.CommitAsync();
-                return true;    
+                return true;
             }
             return false;
         }
+        public async Task<string> RefreshTokenLogin(string url)
+        {
+            _request.Client.SetHeader(headersDefault);
+            var responseMessageHome = await _request.Client.GetAsync(url);
+            if (responseMessageHome.IsSuccessStatusCode)
+            {
+                string token = Regex.Match(_request.Client.Content, "name=\"__RequestVerificationToken\" type=\"hidden\" value=\"(.*?)\"").Groups[1].Value;
+                accountMe.Value.__RequestVerificationToken = token;
+                _account.Update(accountMe.Value);
+                await UnitOfWork.CommitAsync();
+                return token;
+            }
+            return string.Empty;
+        }
         public async Task<CourseResponse> GetInfoCourse(string courseCode)
         {
-            var response = await _request.Client.GetAsync($"https://{accountMe.DomainSchool}/Studying/Courses/{courseCode}/");
+            var response = await _request.Client.GetAsync($"https://{UrlBase.Value}/Studying/Courses/{courseCode}/");
             if (response.IsSuccessStatusCode)
             {
                 string content = _request.Client.Content;
@@ -156,7 +174,7 @@ namespace Domain.Common.API
         }
         public async Task<ClassCheckResponse> GetInfoClass(string classCode)
         {
-            var response = await _request.Client.GetAsync($"https://{accountMe.DomainSchool}/Course/Details/{classCode}/");
+            var response = await _request.Client.GetAsync($"https://{UrlBase.Value}/Course/Details/{classCode}/");
             if (response.IsSuccessStatusCode)
             {
                 string content = _request.Client.Content;
@@ -170,7 +188,14 @@ namespace Domain.Common.API
                 string thoikhoabieu = doc.DocumentNode.SelectSingleNode("//*[@id=\"courseInformation\"]/fieldset[2]/div[3]/div/p")?.InnerText;
                 string maxStudent = doc.DocumentNode.SelectSingleNode("//*[@id=\"courseInformation\"]/fieldset[2]/div[5]/div/p/span[2]")?.InnerText;
                 string courseName = nameClass?.Split('-')?[0]?.Trim();
-                 
+                if(string.IsNullOrEmpty(nameClass) || 
+                    string.IsNullOrEmpty(nameLecturer) || 
+                    string.IsNullOrEmpty(thoikhoabieu) ||
+                    string.IsNullOrEmpty(maxStudent) ||
+                    string.IsNullOrEmpty(courseName))
+                {
+                    return null;
+                }
                 ClassCheckResponse classCheckResponse = new ClassCheckResponse()
                 {
                     Code = classCode,

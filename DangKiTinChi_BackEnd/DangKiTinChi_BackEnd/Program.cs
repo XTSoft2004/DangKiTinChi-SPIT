@@ -1,4 +1,5 @@
-﻿using Domain.Common.BackgroudServices;
+﻿using DangKiTinChi_BackEnd.Filters;
+using Domain.Common.BackgroudServices;
 using Domain.Common.Http;
 using Domain.Interfaces.Repositories;
 using Domain.Interfaces.Services;
@@ -48,6 +49,7 @@ builder.Services.AddSwaggerGen(options =>
     // ❌ KHÔNG thêm AddSecurityRequirement ở đây (nó sẽ áp dụng cho tất cả API)
 
     // ✅ Thêm OperationFilter để chỉ áp dụng với các API có [Authorize]
+    options.OperationFilter<AddAccountHeaderParameter>();
     options.OperationFilter<AuthorizeCheckOperationFilter>();
 
     var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";

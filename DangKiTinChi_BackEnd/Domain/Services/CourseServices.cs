@@ -19,18 +19,15 @@ namespace Domain.Services
     public class CourseServices : BaseService, ICourseServices
     {
         private readonly IRepositoryBase<Courses>? _course;
-        private readonly IRepositoryBase<Department>? _department;
         private readonly ITokenServices _tokenServices;
         private UserTokenResponse? userMeToken;
         private readonly ISchoolAPI _schoolAPI;
-        public CourseServices(IRepositoryBase<Courses>? course, ITokenServices tokenServices, IRepositoryBase<Department>? department, ISchoolAPI schoolAPI = null)
+        public CourseServices(IRepositoryBase<Courses>? course, ITokenServices tokenServices, ISchoolAPI schoolAPI = null)
         {
             _course = course;
-            _department = department;
             _tokenServices = tokenServices;
             userMeToken = _tokenServices.GetTokenBrowser();
             _schoolAPI = schoolAPI;
-            _schoolAPI.SetAccount(-1).GetAwaiter().GetResult();
         }
 
         public async Task<HttpResponse> CreateAsync(CourseRequest courseRequest)
@@ -92,7 +89,6 @@ namespace Domain.Services
         public async Task<(List<CourseResponse>?, int TotalRecords)> GetAllAsync(string search, int pageNumber, int pageSize)
         {
             var query = _course.All()
-                //.Include(c => c.Department)
                 .AsQueryable();
 
             if (!string.IsNullOrEmpty(search))
@@ -117,7 +113,6 @@ namespace Domain.Services
                 Code = x.Code,
                 Name = x.Name,
                 Credit = x.Credit,
-                //DepartmentName = x.Department.Name,
             }).ToListAsync();
 
             return (courseSearch, TotalRecords);

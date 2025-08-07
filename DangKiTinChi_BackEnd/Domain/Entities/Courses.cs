@@ -1,4 +1,5 @@
-﻿using Domain.Entities.Base;
+﻿using Domain.Common;
+using Domain.Entities.Base;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -16,6 +17,7 @@ namespace Domain.Entities
         public string? Name { get; set; }
         // Số tín chỉ của môn học
         public int? Credit { get; set; }
+        public School_Enum? SchoolEnum { get; set; }
 
         public ICollection<Classes>? Classes { get; set; }
     }

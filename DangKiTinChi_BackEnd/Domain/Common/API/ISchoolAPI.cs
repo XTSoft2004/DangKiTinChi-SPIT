@@ -41,6 +41,6 @@ namespace Domain.Common.API
         /// </summary>
         /// <param name="AccountId"></param>
         /// <returns></returns>
-        Task SetAccount(long? AccountId);
+        void SetAccountContext();
     }
 }

@@ -13,7 +13,5 @@ namespace Domain.Model.Response.Course
         public string? Code { get; set; }
         public string? Name { get; set; }
         public int? Credit { get; set; }
-
-        //public string? DepartmentName { get; set; }
     }
 }

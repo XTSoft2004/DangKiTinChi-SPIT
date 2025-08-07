@@ -13,5 +13,6 @@ namespace Domain.Interfaces.Common
         string GetHeader(string key);
         string GetItem(string key);
         string GetCurrentUrl();
+        long? GetAccountId();
     }
 }

@@ -56,12 +56,13 @@ namespace Domain.Common.HttpRequest
         public void SetAccount(Account account)
         {
             accountMe = account;
+            string urlBase = AppFunction.GetDomainSchool(accountMe.SchoolEnum);
             // Setup request
-            if (!string.IsNullOrEmpty(accountMe.DomainSchool))
-                _request.SetAddress($"https://{accountMe.DomainSchool}/");
+            //if (!string.IsNullOrEmpty(urlBase))
+            //    _request.SetAddress($"https://{urlBase}/");
 
             if (!string.IsNullOrEmpty(accountMe.Cookie))
-                _request.SetCookie(accountMe.Cookie, "/", accountMe.DomainSchool ?? string.Empty);
+                _request.SetCookie(accountMe.Cookie, "/", urlBase ?? string.Empty);
 
             var accountClass = _accountClasses.Find(f => f.AccountId == accountMe.UserId);
             if (accountClass != null && accountClass.InfoProxy != null && !string.IsNullOrEmpty(accountClass.InfoProxy.Proxy))

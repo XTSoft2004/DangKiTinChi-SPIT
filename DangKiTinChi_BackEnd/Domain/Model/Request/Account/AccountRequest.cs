@@ -11,6 +11,6 @@ namespace Domain.Model.Request.Account
     {
         public string? Username { get; set; }
         public string? Password { get; set; }
-        public string? DomainSchool { get; set; }
+        public string? SchoolEnum { get; set; }
     }
 }

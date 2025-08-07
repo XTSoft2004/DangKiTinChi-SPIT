@@ -3,6 +3,7 @@ using Domain.Common;
 using Domain.Common.API;
 using Domain.Common.Http;
 using Domain.Entities;
+using Domain.Interfaces.Common;
 using Domain.Interfaces.Repositories;
 using Domain.Interfaces.Services;
 using Domain.Model.Request.Class;
@@ -34,22 +35,29 @@ namespace Domain.Services
         private readonly ICourseServices _courseServices;
         private UserTokenResponse? userMeToken;
         private readonly ISchoolAPI _schoolAPI;
-        public ClassServices(IRepositoryBase<Classes> @class, ITokenServices tokenServices, IRepositoryBase<Courses> course, ITimeServices timeServices, IRepositoryBase<TimeClass> timeClass, ISchoolAPI schoolAPI, IRepositoryBase<Time> time, ICourseServices courseServices)
+        private readonly IRepositoryBase<Account> _account;
+        private readonly IHttpContextHelper _httpContextHelper;
+        public ClassServices(IRepositoryBase<Classes> @class, ITokenServices tokenServices, IRepositoryBase<Courses> course, ITimeServices timeServices, IRepositoryBase<TimeClass> timeClass, ISchoolAPI schoolAPI, IRepositoryBase<Time> time, ICourseServices courseServices, IRepositoryBase<Account> account, IHttpContextHelper httpContextHelper)
         {
             _class = @class;
             _course = course;
             _tokenServices = tokenServices;
             _timeServices = timeServices;
-            userMeToken = _tokenServices.GetTokenBrowser();
             _timeClass = timeClass;
             _schoolAPI = schoolAPI;
-            _schoolAPI.SetAccount(-1).GetAwaiter().GetResult();
             _time = time;
             _courseServices = courseServices;
+            _account = account;
+            userMeToken = _tokenServices.GetTokenBrowser();
+            _httpContextHelper = httpContextHelper;
         }
 
         public async Task<HttpResponse> CreateAsync(ClassRequest classRequest)
         {
+            var listAccounts = _account.ListBy(l => l.UserId == userMeToken.Id).Select(s => (long?)s.Id).ToList();
+            if (!listAccounts.Contains(_httpContextHelper.GetAccountId()))
+                return HttpResponse.Error("Account này không tồn tại ở người dùng này!", System.Net.HttpStatusCode.Forbidden);
+
             var existingClass = await _class.FindAsync(f => f.Code == classRequest.Code);
             if (existingClass != null)
                 return HttpResponse.Error("Lớp học đã tồn tại!", System.Net.HttpStatusCode.Conflict);
@@ -112,6 +120,10 @@ namespace Domain.Services
         }
         public async Task<HttpResponse> UpdateAsync(long classId)
         {
+            var listAccounts = _account.ListBy(l => l.UserId == userMeToken.Id).Select(s => (long?)s.Id).ToList();
+            if (!listAccounts.Contains(_httpContextHelper.GetAccountId()))
+                return HttpResponse.Error("Account này không tồn tại ở người dùng này!", System.Net.HttpStatusCode.Forbidden);
+
             var existingClass = await _class.FindAsync(f => f.Id == classId);
             if (existingClass == null)
                 return HttpResponse.Error("Lớp học không tồn tại!", System.Net.HttpStatusCode.NotFound);
@@ -189,7 +201,6 @@ namespace Domain.Services
         {
             var query = _class.All()
                 .Include(c => c.Course)
-                //.Include(c => c.Lecturer)
                 .AsQueryable();
 
             if (!string.IsNullOrEmpty(search))
@@ -197,7 +208,6 @@ namespace Domain.Services
                 search = search.ToLower();
                 query = query.Where(w => w.Name.ToLower().Contains(search) ||
                                         w.MaxStudent.ToString().Contains(search) ||
-                                        //w.Lecturer.Name.ToString().ToLower().Contains(search) ||
                                         w.Course.Name.ToString().ToLower().Contains(search));
             }
 
@@ -216,7 +226,6 @@ namespace Domain.Services
                 Code = x.Code,
                 Name = x.Name,
                 MaxStudent = x.MaxStudent,
-                //LecturerName = x.Lecturer.Name,
                 CourseName = x.Course.Name
             }).ToListAsync();
 

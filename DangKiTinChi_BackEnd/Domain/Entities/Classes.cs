@@ -1,4 +1,5 @@
-﻿using Domain.Entities.Base;
+﻿using Domain.Common;
+using Domain.Entities.Base;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -16,6 +17,7 @@ namespace Domain.Entities
         public string? Name { get; set; }
         // Số lượng tối đa sinh viên
         public long? MaxStudent { get; set; }
+        public School_Enum? SchoolEnum { get; set; }
 
         public long? CourseId { get; set; }
         [ForeignKey(nameof(CourseId))]

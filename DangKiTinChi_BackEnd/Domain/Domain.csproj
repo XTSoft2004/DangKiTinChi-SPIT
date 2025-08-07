@@ -33,4 +33,10 @@
     <Folder Include="CourseClass\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="CourseClass\Course_HUSC.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

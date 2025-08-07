@@ -1,4 +1,5 @@
-﻿using Domain.Entities.Base;
+﻿using Domain.Common;
+using Domain.Entities.Base;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -26,7 +27,7 @@ namespace Domain.Entities
         [StringLength(50)]
         public string? SemeterName { get; set; }
         // Url của trường học
-        public string? DomainSchool { get; set; }
+        public School_Enum SchoolEnum { get; set; }
         // Token của người dùng
         public string? __RequestVerificationToken { get; set; }
 

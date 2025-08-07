@@ -48,7 +48,7 @@ namespace Domain.Services
             {
                 UserName = accountRequest.Username,
                 Password = accountRequest.Password,
-                DomainSchool = accountRequest.DomainSchool,
+                SchoolEnum = EnumExtensions.GetEnumValueFromDisplayName(accountRequest.SchoolEnum, School_Enum.HUSC),
                 User = user,
                 UserId = user?.Id,
                 CreatedDate = DateTime.Now
@@ -70,7 +70,7 @@ namespace Domain.Services
             existingAccount.SemeterName = accountUpdateRequest.SemeterName ?? existingAccount.SemeterName;
             existingAccount.Cookie = accountUpdateRequest.Cookie ?? existingAccount.Cookie;
             existingAccount.__RequestVerificationToken = accountUpdateRequest.__RequestVerificationToken ?? existingAccount.__RequestVerificationToken;
-            existingAccount.DomainSchool = accountUpdateRequest.DomainSchool ?? existingAccount.DomainSchool;
+            existingAccount.SchoolEnum = EnumExtensions.GetEnumValueFromDisplayName(accountUpdateRequest.SchoolEnum, existingAccount.SchoolEnum);
 
             _account.Update(existingAccount);
             await UnitOfWork.CommitAsync();
@@ -121,7 +121,7 @@ namespace Domain.Services
                 SemeterName = d.SemeterName,
                 Cookie = d.Cookie,
                 __RequestVerificationToken = d.__RequestVerificationToken,
-                DomainSchool = d.DomainSchool
+                SchoolEnum = EnumExtensions.GetEnumDisplayName<School_Enum>(d.SchoolEnum)
             }).ToListAsync();
 
             return (accountSearch, TotalRecords);

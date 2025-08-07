@@ -10,6 +10,13 @@ namespace Domain.Common
         [Display(Name = "User")]
         User,
     }
+    public enum School_Enum
+    {
+        [Display(Name = "Đại học Khoa Học Huế")]
+        HUSC,
+        [Display(Name = "Đại học Ngoại Ngữ Huế")]
+        HUFIS,
+    }
     public enum Register_Enum
     {
         [Display(Name = "Đã đăng ký")]

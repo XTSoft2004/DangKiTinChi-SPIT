@@ -4,6 +4,7 @@ using Infrastructure.ContextDB;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250807081926_Remove_Department_Lecturer")]
+    partial class Remove_Department_Lecturer
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -39,6 +42,9 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("DomainSchool")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("FullName")
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
@@ -53,9 +59,6 @@ namespace Infrastructure.Migrations
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
-
-                    b.Property<int>("SchoolEnum")
-                        .HasColumnType("int");
 
                     b.Property<string>("SemeterName")
                         .HasMaxLength(50)
@@ -83,21 +86,11 @@ namespace Infrastructure.Migrations
                         {
                             Id = -1L,
                             CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DomainSchool = "student.husc.edu.vn",
                             FullName = "Trần Xuân Trường",
                             Password = "Xuantruong23*",
-                            SchoolEnum = 0,
                             UserId = -1L,
                             UserName = "22T1020784"
-                        },
-                        new
-                        {
-                            Id = -2L,
-                            CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            FullName = "Nguyễn Thị Cẩm Thanh",
-                            Password = "Thanhthanh@1",
-                            SchoolEnum = 1,
-                            UserId = -1L,
-                            UserName = "22F7510310"
                         });
                 });
 
@@ -183,9 +176,6 @@ namespace Infrastructure.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("SchoolEnum")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CourseId");
@@ -221,9 +211,6 @@ namespace Infrastructure.Migrations
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("SchoolEnum")
-                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
