@@ -1,4 +1,4 @@
-export interface ILogin {
+export interface ILoginRequest {
   userName: string;
   password: string;
   deviceId: string;
@@ -6,7 +6,7 @@ export interface ILogin {
 
 export interface ILoginResponse {
   id: number;
-  username: string;
+  userName: string;
   fullname: string;
   roleName: string;
   avatarUrl?: string;
@@ -17,7 +17,7 @@ export interface ILoginResponse {
   refreshExpiresAt: DateTime;
 }
 
-export interface IRegister {
+export interface IRegisterRequest {
   userName: string;
   password: string;
   fullName: string;

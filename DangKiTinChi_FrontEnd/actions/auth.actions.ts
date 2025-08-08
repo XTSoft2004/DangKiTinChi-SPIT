@@ -1,16 +1,16 @@
 "use server";
 
 import globalConfig from "@/app.config";
-import { ILogin, ILoginResponse, IRegister } from "@/types/auth";
+import { ILoginRequest, ILoginResponse, IRegisterRequest } from "@/types/auth";
 import { IShowResponse } from "@/types/global";
 import { cookies, headers } from "next/headers";
 
-export const login = async (formData: ILogin) => {
+export const loginAccount = async (formData: ILoginRequest) => {
   const response = await fetch(`${globalConfig.baseUrl}/auth/login`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${(await cookies()).get("refreshToken")?.value}`,
+      // Authorization: `Bearer ${(await cookies()).get("refreshToken")?.value}`,
     },
     body: JSON.stringify(formData),
   });
@@ -33,7 +33,7 @@ export const login = async (formData: ILogin) => {
   } as IShowResponse<ILoginResponse>;
 };
 
-export const register = async (formData: IRegister) => {
+export const register = async (formData: IRegisterRequest) => {
   const response = await fetch(`${globalConfig.baseUrl}/auth/register`, {
     method: "POST",
     headers: {
@@ -76,7 +76,7 @@ export const refreshToken = async () => {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${(await cookies()).get("refreshToken")?.value}`,
+      Authorization: `Bearer ${(await cookies()).get("accessToken")?.value}`,
     },
   });
 
