@@ -30,6 +30,8 @@ namespace Domain.Common.API
         private readonly IHttpRequestHelper _request;
         private readonly IRepositoryBase<Account> _account;
         private readonly IHttpContextHelper _httpContextHelper;
+        private readonly ITokenServices _tokenServices;
+        private UserTokenResponse? userMeToken;
         private readonly AsyncLocal<Account> accountMe = new();
         private readonly AsyncLocal<string> UrlBase = new();
         public Dictionary<string, string> headersDefault = new Dictionary<string, string>()
@@ -48,11 +50,13 @@ namespace Domain.Common.API
             {"User-Agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"},
         };
 
-        public SchoolAPI(IHttpRequestHelper request, IRepositoryBase<Account> account, IHttpContextHelper httpContextHelper)
+        public SchoolAPI(IHttpRequestHelper request, IRepositoryBase<Account> account, IHttpContextHelper httpContextHelper, ITokenServices tokenServices)
         {
             _request = request;
             _account = account;
             _httpContextHelper = httpContextHelper;
+            _tokenServices = tokenServices;
+            userMeToken = _tokenServices.GetTokenBrowser();
             SetAccountContext();
         }
         public void SetAccountContext()
@@ -65,9 +69,8 @@ namespace Domain.Common.API
                 _request.SetAccount(account);
             }
         }
-        public async Task<bool> LoginAccount(long? AccountId)
+        public async Task<bool> LoginAccount(Account accountLogin)
         {
-            var accountLogin = await _account.FindAsync(f => f.Id == AccountId);
             string UrlBase = AppFunction.GetDomainSchool(accountLogin.SchoolEnum);
 
             RequestHttpClient _requestLogin = new RequestHttpClient();

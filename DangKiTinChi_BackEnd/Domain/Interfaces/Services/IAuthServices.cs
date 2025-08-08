@@ -1,5 +1,4 @@
 ﻿using Domain.Common.Http;
-using Domain.Model.Request;
 using Domain.Model.Request.Auth;
 using System;
 using System.Collections.Generic;

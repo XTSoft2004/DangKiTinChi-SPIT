@@ -6,7 +6,6 @@ using Domain.Entities;
 using Domain.Interfaces.Database;
 using Domain.Interfaces.Repositories;
 using Domain.Interfaces.Services;
-using Domain.Model.Request;
 using Domain.Model.Request.Auth;
 using Domain.Model.Request.TokenUser;
 using Domain.Model.Response.Auth;

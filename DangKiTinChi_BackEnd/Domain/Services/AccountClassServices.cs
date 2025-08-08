@@ -44,9 +44,12 @@ namespace Domain.Services
             if (classes == null)
                 return HttpResponse.Error(message: "Lớp học không tồn tại", statusCode: System.Net.HttpStatusCode.NotFound);
 
-            var infoProxy = _infoProxy.Find(x => x.Id == FormData.InfoProxyId);
-            if (infoProxy == null)
-                return HttpResponse.Error(message: "Proxy không tồn tại", statusCode: System.Net.HttpStatusCode.NotFound);
+            if(FormData.InfoProxyId != null)
+            {
+                var infoProxy = _infoProxy.Find(x => x.Id == FormData.InfoProxyId);
+                if (infoProxy == null)
+                    return HttpResponse.Error(message: "Proxy không tồn tại", statusCode: System.Net.HttpStatusCode.NotFound);
+            }
 
             var accountClass = new AccountClasses()
             {

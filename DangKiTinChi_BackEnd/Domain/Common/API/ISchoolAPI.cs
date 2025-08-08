@@ -1,4 +1,5 @@
-﻿using Domain.Model.Request.Account;
+﻿using Domain.Entities;
+using Domain.Model.Request.Account;
 using Domain.Model.Request.Class;
 using Domain.Model.Request.Course;
 using Domain.Model.Response.Course;
@@ -23,7 +24,7 @@ namespace Domain.Common.API
         /// </summary>
         /// <param name="AccountId"></param>
         /// <returns></returns>
-        Task<bool> LoginAccount(long? AccountId);
+        Task<bool> LoginAccount(Account account);
         /// <summary>
         /// Lấy thông tin của môn học đó
         /// </summary>

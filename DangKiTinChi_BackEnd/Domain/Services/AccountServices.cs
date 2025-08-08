@@ -22,8 +22,8 @@ namespace Domain.Services
     {
         private readonly IRepositoryBase<Account>? _account;
         private readonly IRepositoryBase<User>? _user;
-        private readonly ITokenServices _tokenServices;
         private readonly ISchoolAPI _schoolAPI;
+        private readonly ITokenServices _tokenServices;
         private UserTokenResponse? userMeToken;
         public AccountServices(IRepositoryBase<Account>? account, ITokenServices tokenServices, ISchoolAPI schoolAPI, IRepositoryBase<User>? user)
         {
@@ -132,7 +132,7 @@ namespace Domain.Services
             if (account == null)
                 return HttpResponse.Error("Tài khoản không tồn tại trong hệ thống!", HttpStatusCode.NotFound);
 
-            var loginAccount = await _schoolAPI.LoginAccount(AccountId);
+            var loginAccount = await _schoolAPI.LoginAccount(account);
             return loginAccount
                 ? HttpResponse.OK(message: "Đăng nhập tài khoản thành công!")
                 : HttpResponse.Error("Đăng nhập tài khoản thất bại, có thể do hệ thống đang quá tải!");

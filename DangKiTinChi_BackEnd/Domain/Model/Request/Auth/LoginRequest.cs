@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Domain.Model.Request
+namespace Domain.Model.Request.Auth
 {
     public class LoginRequest
     {

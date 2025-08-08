@@ -11,6 +11,7 @@ using Domain.Model.Request.Course;
 using Domain.Model.Request.Time;
 using Domain.Model.Response.Class;
 using Domain.Model.Response.Course;
+using Domain.Model.Response.Time;
 using Domain.Model.Response.User;
 using Microsoft.EntityFrameworkCore;
 using Sprache;
@@ -116,7 +117,7 @@ namespace Domain.Services
             }
             await UnitOfWork.CommitAsync();
 
-            return HttpResponse.OK(message: $"Tạo lớp học {classCheck.Name} thành công!", statusCode: System.Net.HttpStatusCode.Created);
+            return HttpResponse.OK(message: $"Tạo lớp học \"{classCheck.Name}\" thành công!", statusCode: System.Net.HttpStatusCode.Created);
         }
         public async Task<HttpResponse> UpdateAsync(long classId)
         {
@@ -201,6 +202,7 @@ namespace Domain.Services
         {
             var query = _class.All()
                 .Include(c => c.Course)
+                .Include(c => c.TimeClasses)
                 .AsQueryable();
 
             if (!string.IsNullOrEmpty(search))
@@ -226,7 +228,14 @@ namespace Domain.Services
                 Code = x.Code,
                 Name = x.Name,
                 MaxStudent = x.MaxStudent,
-                CourseName = x.Course.Name
+                CourseName = x.Course.Name,
+                TimeClasses = x.TimeClasses.Select(tc => new TimeResponse
+                {
+                    Day = tc.Times.Day,
+                    StartTime = tc.Times.StartTime,
+                    EndTime = tc.Times.EndTime,
+                    Room = tc.Times.Room
+                }).ToList()
             }).ToListAsync();
 
             return (courseSearch, TotalRecords);
