@@ -46,16 +46,16 @@ export async function middleware(request: NextRequest) {
   console.log("server >> middleware", nextUrl);
 
   const accessToken = (await cookies()).get("accessToken")?.value;
-  
+
   // Định nghĩa các route cần bảo vệ (cần đăng nhập)
   const protectedRoutes = ["/", "/user", "/course"];
   // Định nghĩa các route auth (không cần đăng nhập)
   const authRoutes = ["/auth"];
-  
-  const isProtectedRoute = protectedRoutes.some(route => 
+
+  const isProtectedRoute = protectedRoutes.some(route =>
     nextUrl === route || nextUrl.startsWith(route + "/")
   );
-  const isAuthRoute = authRoutes.some(route => 
+  const isAuthRoute = authRoutes.some(route =>
     nextUrl === route || nextUrl.startsWith(route + "/")
   );
 
@@ -74,7 +74,7 @@ export async function middleware(request: NextRequest) {
   if (accessToken) {
     // Verify token bằng cách gọi API /user/me
     const userResponse = await getMe();
-    
+
     // Nếu token không hợp lệ -> redirect về auth
     if (!userResponse?.ok) {
       console.log("Invalid token, redirecting to /auth");
