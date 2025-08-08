@@ -1,9 +1,9 @@
-// export interface IMeta {
-//   totalRecords: number
-//   totalPages: number
-//   currentPage: number
-//   pageSize: number
-// }
+export interface IMeta {
+  totalRecords: number
+  totalPages: number
+  currentPage: number
+  pageSize: number
+}
 
 interface IBaseResponse {
   ok: boolean;
@@ -14,7 +14,7 @@ interface IBaseResponse {
 export interface IResponse extends IBaseResponse {}
 
 export interface IIndexResponse<T> extends IBaseResponse {
-  // IMeta
+  IMeta
   data: T[];
 }
 

@@ -1,7 +1,10 @@
+import { DashboardContent } from "@/components/dashboard/dashboard-content";
+import { DashboardLayout } from "@/components/layout/dashboard-layout";
+
 export default function Home() {
   return (
-    <main>
-      <h1>Hẹ hẹ</h1>
-    </main>
+    <DashboardLayout>
+      <DashboardContent />
+    </DashboardLayout>
   );
 }
