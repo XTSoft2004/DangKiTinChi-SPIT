@@ -5,19 +5,16 @@ import { Button } from "@/components/ui/shadcn-ui/button";
 import { CustomInputField } from "@/components/ui/Input/CustomInputField";
 import { User, Lock, UserPlus } from "lucide-react";
 import { useState } from "react";
+import { ToastHelper } from "@/utils/useAppToast";
+import { registerAccount } from "@/actions/auth.actions";
+import { IRegisterRequest } from "@/types/auth";
 
-interface SignUpData {
-  fullName: string;
-  userName: string;
-  password: string;
-  confirmPassword: string;
-}
 
 export function SignUpForm() {
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [termsError, setTermsError] = useState("");
 
-  const methods = useForm<SignUpData>({
+  const methods = useForm<IRegisterRequest>({
     defaultValues: {
       fullName: "",
       userName: "",
@@ -27,17 +24,31 @@ export function SignUpForm() {
 
   const { handleSubmit } = methods;
 
-  const onSubmit = (data: SignUpData) => {
+  const onSubmit = async (data: IRegisterRequest) => {
     // Reset terms error
     setTermsError("");
 
     // Check if terms are accepted
     if (!acceptTerms) {
-      setTermsError("Bạn phải chấp nhận điều khoản và chính sách để tiếp tục");
+      ToastHelper.error({
+        title: "Chưa chấp nhận điều khoản",
+        description: "Bạn cần chấp nhận điều khoản và chính sách để tiếp tục.",
+      });
       return;
     }
 
-    console.log("Sign up:", data);
+    const response = await registerAccount(data);
+    if (response.ok) {
+      ToastHelper.success({
+        title: "Đăng ký thành công",
+        description: "Tài khoản của bạn đã được tạo thành công!",
+      });
+    } else {
+      ToastHelper.error({
+        title: "Đăng ký thất bại",
+        description: response.message || "Đã có lỗi xảy ra trong quá trình đăng ký.",
+      });
+    }
   };
 
   return (
@@ -66,10 +77,17 @@ export function SignUpForm() {
 
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-200">
             <CustomInputField
-              name="username"
+              name="userName"
               label="Tên đăng nhập"
               placeholder="Nhập tên đăng nhập"
               icon={<User className="w-4 h-4 sm:w-5 sm:h-5" />}
+              rules={{
+                required: "Tên đăng nhập là bắt buộc",
+                pattern: {
+                  value: /^[a-zA-Z0-9_]+$/,
+                  message: "Tên đăng nhập không được chứa dấu cách hoặc ký tự Unicode",
+                },
+              }}
             />
           </div>
 

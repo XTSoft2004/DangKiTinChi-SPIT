@@ -8,8 +8,12 @@ import { loginAccount } from "@/actions/auth.actions";
 import { ILoginRequest } from "@/types/auth";
 import { toast } from "sonner";
 import { getOrCreateDeviceId } from "@/utils/deviceId";
+import { ToastHelper } from "@/utils/useAppToast";
+import { useRouter } from "next/navigation";
 
 export function SignInForm() {
+  const router = useRouter();
+
   const methods = useForm<ILoginRequest>({
     defaultValues: {
       userName: "",
@@ -20,13 +24,23 @@ export function SignInForm() {
   const { handleSubmit } = methods;
 
   const onSubmit = async (data: ILoginRequest) => {
-    const deviceId = getOrCreateDeviceId()
+    ToastHelper.loading({
+      title: "Đang đăng nhập, vui lòng đợi...",
+      duration: 1000,
+    });
+    const deviceId = getOrCreateDeviceId();
     const loginResponse = await loginAccount({ ...data, deviceId });
     if (loginResponse.ok) {
-      toast.success("Đăng nhập thành công!");
-    }
-    else {
-      toast.error(loginResponse.message || "Đăng nhập thất bại. Vui lòng thử lại.");
+      ToastHelper.success({
+        title: "Đăng nhập thành công",
+        description: "Chào mừng bạn đã quay trở lại!",
+      });
+      router.push("/admin/user");
+    } else {
+      ToastHelper.error({
+        title: "Đăng nhập thất bại",
+        description: loginResponse.message || "Vui lòng kiểm tra tài khoản và mật khẩu lại!",
+      })
     }
   };
 

@@ -33,7 +33,7 @@ export const loginAccount = async (formData: ILoginRequest) => {
   } as IShowResponse<ILoginResponse>;
 };
 
-export const register = async (formData: IRegisterRequest) => {
+export const registerAccount = async (formData: IRegisterRequest) => {
   const response = await fetch(`${globalConfig.baseUrl}/auth/register`, {
     method: "POST",
     headers: {
