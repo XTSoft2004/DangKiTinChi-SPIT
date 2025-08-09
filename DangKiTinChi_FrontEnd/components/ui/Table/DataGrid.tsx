@@ -6,6 +6,7 @@ import useSWR from 'swr';
 import { IIndexResponse } from '@/types/global';
 import Searchbar from './Searchbar';
 import { CirclePlus, Settings } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 type DataGridProps<T> = {
     rowSelection?: TableProps<T>['rowSelection'];
@@ -21,6 +22,10 @@ type DataGridProps<T> = {
     onSelectionChange?: (selected: T | null) => void;
     enableColumnFilter?: boolean; // Tùy chọn bật/tắt column filter
     defaultColumns?: string[]; // Danh sách các cột hiển thị mặc định (nếu không có sẽ hiển thị tất cả)
+    responsiveColumns?: {
+        mobile?: string[]; // Cột hiển thị trên mobile
+        tablet?: string[]; // Cột hiển thị trên tablet
+    };
 };
 
 const DataGrid = <T extends object>({
@@ -34,12 +39,14 @@ const DataGrid = <T extends object>({
     onSelectionChange,
     enableColumnFilter = true,
     defaultColumns = [],
+    responsiveColumns,
 }: DataGridProps<T>) => {
     // Basic states
     const [pageIndex, setPageIndex] = useState(1);
     const [pageSize, setPageSize] = useState(6);
     const [searchText, setSearchText] = useState('');
     const [selectedKey, setSelectedKey] = useState<React.Key | null>(null);
+    const isMobile = useIsMobile();
 
     // Column filter states
     const [hiddenColumns, setHiddenColumns] = useState<Set<string>>(new Set());
@@ -94,12 +101,11 @@ const DataGrid = <T extends object>({
                     totalPages: 0,
                     currentPage: 1,
                     pageSize: limit,
-                    IMeta: {},
                 } as IIndexResponse<T>);
             }
         },
         { revalidateOnFocus: false }
-    );    // Expose mutate function globally for external use
+    );   // Expose mutate function globally for external use
 
     useEffect(() => {
         if (nameTable) {

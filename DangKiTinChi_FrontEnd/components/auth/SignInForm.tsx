@@ -46,7 +46,7 @@ export function SignInForm() {
 
   return (
     <FormProvider {...methods}>
-      <div className="w-full max-w-lg mx-auto space-y-0.5 sm:space-y-1 px-1">
+      <div className="w-full max-w-2xl mx-auto space-y-0.5 sm:space-y-1 px-1">
         {/* Welcome Message */}
         <div className="text-center mb-4 sm:mb-6">
           <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-slate-800 mb-2">

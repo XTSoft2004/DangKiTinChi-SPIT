@@ -1,20 +1,59 @@
 @import "tailwindcss";
+@import "../styles/responsive.css";
 
 body {
-  font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
+  font-family: "Inter", "Segoe UI", "Roboto", sans-serif;
+}
+
+/* Auth page specific styles */
+.auth-container {
+  min-height: 100vh;
+}
+
+.auth-form-container {
+  max-width: 400px;
+  width: 100%;
+}
+
+.auth-logo {
+  width: 48px;
+  height: 48px;
+}
+
+.auth-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.auth-title {
+  font-size: 1.5rem;
+  line-height: 2rem;
+}
+
+.auth-subtitle {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+.auth-background-container {
+  width: 50%;
+  min-height: 100vh;
 }
 
 /* Custom styles for auth page */
 .bg-grid-pattern {
-  background-image: 
-    linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+  background-image: linear-gradient(
+      rgba(255, 255, 255, 0.1) 1px,
+      transparent 1px
+    ),
     linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
   background-size: 20px 20px;
 }
 
 /* Animation for floating elements */
 @keyframes float {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0px);
   }
   50% {

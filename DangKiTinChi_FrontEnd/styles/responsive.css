@@ -1,0 +1,100 @@
+/* Responsive Typography Classes */
+@layer utilities {
+  .text-responsive-xs {
+    @apply text-xs sm:text-sm;
+  }
+
+  .text-responsive-sm {
+    @apply text-sm sm:text-base;
+  }
+
+  .text-responsive-base {
+    @apply text-base sm:text-lg;
+  }
+
+  .text-responsive-lg {
+    @apply text-lg sm:text-xl;
+  }
+
+  .text-responsive-xl {
+    @apply text-xl sm:text-2xl;
+  }
+
+  .text-responsive-2xl {
+    @apply text-2xl sm:text-3xl;
+  }
+
+  /* Responsive Spacing Classes */
+  .p-responsive {
+    @apply p-3 sm:p-4 lg:p-6;
+  }
+
+  .px-responsive {
+    @apply px-3 sm:px-4 lg:px-6;
+  }
+
+  .py-responsive {
+    @apply py-3 sm:py-4 lg:py-6;
+  }
+
+  .gap-responsive {
+    @apply gap-3 sm:gap-4 lg:gap-6;
+  }
+
+  .space-y-responsive > * + * {
+    @apply mt-3 sm:mt-4 lg:mt-6;
+  }
+
+  /* Container Classes */
+  .container-responsive {
+    @apply px-4 sm:px-6 lg:px-8;
+  }
+
+  /* Card Classes */
+  .card-responsive {
+    @apply p-4 sm:p-6 lg:p-8;
+  }
+
+  /* Button Classes */
+  .btn-responsive {
+    @apply px-3 py-2 sm:px-4 sm:py-2.5 lg:px-6 lg:py-3;
+  }
+
+  /* Grid Classes */
+  .grid-responsive-1 {
+    @apply grid-cols-1;
+  }
+
+  .grid-responsive-2 {
+    @apply grid-cols-1 sm:grid-cols-2;
+  }
+
+  .grid-responsive-3 {
+    @apply grid-cols-1 sm:grid-cols-2 lg:grid-cols-3;
+  }
+
+  .grid-responsive-4 {
+    @apply grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4;
+  }
+
+  .grid-responsive-6 {
+    @apply grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6;
+  }
+
+  /* Hide/Show Elements */
+  .hide-mobile {
+    @apply hidden sm:block;
+  }
+
+  .hide-desktop {
+    @apply block sm:hidden;
+  }
+
+  .show-mobile {
+    @apply block sm:hidden;
+  }
+
+  .show-desktop {
+    @apply hidden sm:block;
+  }
+}

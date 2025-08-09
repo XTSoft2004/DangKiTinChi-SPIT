@@ -1,5 +1,5 @@
-import { UserContent } from "@/components/user/user-content";
+import UserPage from "@/components/admin/user/PageTable";
 
-export default function UserPage() {
-  return <UserContent />;
+export default function PageUser() {
+  return <UserPage />;
 }

@@ -53,7 +53,7 @@ export function SignUpForm() {
 
   return (
     <FormProvider {...methods}>
-      <div className="w-full max-w-lg mx-auto space-y-0.5 sm:space-y-1 px-1">
+      <div className="w-full max-w-2xl mx-auto space-y-0.5 sm:space-y-1 px-1">
         {/* Welcome Message */}
         <div className="text-center">
           <h2 className="text-sm sm:text-xl md:text-2xl font-bold text-slate-800 mb-2">
@@ -117,7 +117,7 @@ export function SignUpForm() {
                   type="checkbox"
                   checked={acceptTerms}
                   onChange={(e) => setAcceptTerms(e.target.checked)}
-                  className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 bg-white border-2 border-gray-300 rounded focus:ring-blue-500 focus:ring-1 transition-all duration-200"
+                  className="w-3 h-3 sm:w-4 sm:h-4 text-blue-600 bg-white border-2 border-gray-300 rounded focus:ring-blue-500 focus:ring-1 transition-all duration-200"
                 />
               </div>
               <div className="flex-1">

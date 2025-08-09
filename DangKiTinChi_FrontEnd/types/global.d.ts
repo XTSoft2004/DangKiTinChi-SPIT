@@ -11,8 +11,7 @@ interface IBaseResponse {
   message: string;
 }
 
-export interface IIndexResponse<T> extends IBaseResponse {
-  IMeta
+export interface IIndexResponse<T> extends IBaseResponse, IMeta {
   data: T[];
 }
 
